@@ -1,5 +1,5 @@
 import os
-from flask.ext.script import Manager
+from flask.ext.script import Manager, prompt_bool
 
 from lobbypy import app
 
@@ -18,6 +18,7 @@ def init_db():
 
 @manager.command
 def drop_db():
+    from lobbypy import db
     if prompt_bool(
             "Are you sure you want to clear the database"):
         db.drop_all()
