@@ -34,7 +34,7 @@ Developing
         pip install -r requirements.txt
 
 * Add the needed environment variables to `.env`
-    * SESSION\_KEY - session key for Flask's cookie
-    * DEV\_DATABASE\_URI - SQLAlchemy URI for the development database
+    * `SESSION_KEY` - session key for Flask's cookie
+    * `DEV_DATABASE_URI` - SQLAlchemy URI for the development database
 
  The file should look something like `env.sample`
