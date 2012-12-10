@@ -27,7 +27,7 @@ def create_or_login(resp):
     match = _steam_id_re.search(resp.identity_url)
     g.player = Player.get_or_create(match.group(1))
     db.session.commit()
-    session['user_id'] = g.player.steam_id
+    session['user_id'] = g.player.id
     flash('You are logged in as %s' % g.player.steam_id)
     return redirect(oid.get_next_url())
 
@@ -38,5 +38,5 @@ def before_request():
 
 def logout():
     session.pop('user_id', None)
-    return redirct(oid.get_next_url())
+    return redirect(oid.get_next_url())
 

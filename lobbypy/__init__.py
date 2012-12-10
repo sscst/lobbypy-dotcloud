@@ -14,7 +14,7 @@ from lobbypy.models import db
 app = Flask(__name__)
 app.secret_key = os.environ['SESSION_KEY']
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ[
-        'DATABASE_URI']
+        'DEV_DATABASE_URI']
 app.debug = True
 
 db.init_app(app)
