@@ -36,5 +36,6 @@ Developing
 * Add the needed environment variables to `.env`
     * `SESSION_KEY` - session key for Flask's cookie
     * `DEV_DATABASE_URI` - SQLAlchemy URI for the development database
+    * `STEAM_API_KEY` - Steam API key
 
  The file should look something like `env.sample`
