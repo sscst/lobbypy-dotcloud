@@ -27,6 +27,47 @@ class Lobby(db.Model):
         self.game_map = game_map
         self.password = password
 
+    def join(self, player):
+        self.spectators.append(player)
+
+    def pop_player(self, player):
+        if player in self.spectators:
+            self.spectators.remove(player)
+            return player
+        else:
+            for team in self.teams:
+                if team.has_player(player):
+                    return team.pop_player(player)
+
+    def leave(self, player):
+        if player in self.spectators:
+            self.spectators.remove(player)
+        else:
+            for team in self.teams:
+                if team.has_player(player):
+                    team.remove_player(player)
+
+    def set_team(self, player, team_id):
+        our_player = self.pop_player(player)
+        if team_id is None:
+            self.spectators.append(player)
+        else:
+            team = self.teams[team_id]
+            if isinstance(our_player, LobbyPlayer):
+                team.append(our_player)
+            else:
+                team.append_player(player)
+
+    def set_class(self, player, class_id):
+        for team in self.teams:
+            if team.has_player(player):
+                team.set_class(player, class_id)
+
+    def toggle_ready(self, player):
+        for team in self.teams:
+            if team.has_player(player):
+                team.toggle_ready(player)
+
 class Team(db.Model):
     __tablename__ = 'team'
     id = db.Column(db.Integer, primary_key=True)
@@ -38,12 +79,42 @@ class Team(db.Model):
     def __init__(self, name):
         self.name = name
 
+    def has_player(self, player):
+        return any([lp.player.id == player.id for lp in self.players])
+
+    def get_lobby_player(self, player):
+        lps = [lp for lp in self.players if lp.player.id == player.id]
+        return lps.pop()
+
+    def append(self, lobby_player):
+        self.players.append(lobby_player)
+
+    def pop_player(self, player):
+        lp = self.get_lobby_player(player)
+        self.players.remove(lp)
+        return lp
+
+    def append_player(self, player):
+        self.players.append(LobbyPlayer(player))
+
+    def remove_player(self, player):
+        lp = self.get_lobby_player(player)
+        self.players.remove(lp)
+
+    def set_class(self, player, class_id):
+        lp = self.get_lobby_player(player)
+        lp.class_id = class_id
+
+    def toggle_ready(self, player):
+        lp = self.get_lobby_player(player)
+        lp.ready = not lp.ready
+
 class LobbyPlayer(db.Model):
     __tablename__ = 'lobby_player'
     team_id = db.Column(db.Integer, db.ForeignKey('team.id'), primary_key=True)
     player_id = db.Column(db.Integer, db.ForeignKey('player.id'), primary_key=True)
     player = db.relationship('Player', uselist=False)
-    player_class = db.Column(db.Integer)
+    class_id = db.Column(db.Integer)
     ready = db.Column(db.Boolean, default=False, nullable=False)
 
     def __init__(self, player, player_class=None):
