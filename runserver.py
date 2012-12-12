@@ -1,7 +1,8 @@
 import os
 from flask.ext.script import Manager, prompt_bool
 
-from lobbypy import app
+from lobbypy import create_app
+app = create_app()
 
 manager = Manager(app)
 # Bind to PORT if defined, otherwise default to 5000.
