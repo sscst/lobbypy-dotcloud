@@ -44,5 +44,6 @@ Developing
 
 ### Usage ###
 
-Use `foreman` to run commands and start the server with the heroku environment.  See
-the [man page](http://ddollar.github.com/foreman/) for documentation.
+Use `foreman` from the Heroku Toolbelt to run commands and start the
+server with the heroku environment.  See the
+[man page](http://ddollar.github.com/foreman/) for documentation.
