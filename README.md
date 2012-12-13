@@ -16,6 +16,8 @@ Requirements
 Developing
 ----------
 
+### Setup ###
+
 * Clone the repository
 
         git clone git@github.com:TronPaul/lobbypy-heroku.git
@@ -39,3 +41,8 @@ Developing
     * `STEAM_API_KEY` - Steam API key
 
  The file should look something like `env.sample`
+
+### Usage ###
+
+Use `foreman` to run commands and start the server with the heroku environment.  See
+the [man page](http://ddollar.github.com/foreman/) for documentation.
