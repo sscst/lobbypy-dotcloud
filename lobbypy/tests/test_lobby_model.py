@@ -20,6 +20,25 @@ class LobbyModelTest(TestCase):
             owner = Player('-1')
         return Lobby(name, owner, server, game_map, password)
 
+    def test_player_count(self):
+        instance = self._makeOne()
+        from lobbypy.models import Player, Team, LobbyPlayer
+        p = Player('0')
+        lp = LobbyPlayer(p)
+        t_A = Team('Red')
+        t_A.players.extend(2 * [lp])
+        t_B = Team('Blu')
+        t_A.players.extend(3 * [lp])
+        instance.teams.extend([t_A, t_B])
+        self.assertEqual(instance.player_count, 5)
+
+    def test_spectator_count(self):
+        instance = self._makeOne()
+        from lobbypy.models import Player
+        p = Player('0')
+        instance.spectators.extend(2 * [p])
+        self.assertEqual(instance.spectator_count, 2)
+
     def test_join(self):
         instance = self._makeOne()
         from lobbypy.models import Player

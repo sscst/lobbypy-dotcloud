@@ -27,6 +27,14 @@ class Lobby(db.Model):
         self.game_map = game_map
         self.password = password
 
+    @property
+    def player_count(self):
+        return sum([len(t) for t in self.teams])
+
+    @property
+    def spectator_count(self):
+        return len(self.spectators)
+
     def join(self, player):
         self.spectators.append(player)
 
@@ -78,6 +86,9 @@ class Team(db.Model):
 
     def __init__(self, name):
         self.name = name
+
+    def __len__(self):
+        return len(self.players)
 
     def has_player(self, player):
         return any([lp.player.id == player.id for lp in self.players])

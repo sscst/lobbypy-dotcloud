@@ -16,6 +16,14 @@ class TeamModelTest(TestCase):
         from lobbypy.models import Team
         return Team(name)
 
+    def test_len(self):
+        instance = self._makeOne()
+        from lobbypy.models import Player, LobbyPlayer
+        p = Player('0')
+        lp = LobbyPlayer(p)
+        instance.players.append(lp)
+        self.assertEqual(len(instance), 1)
+
     def test_has_player(self):
         instance = self._makeOne()
         from lobbypy.models import Player, LobbyPlayer
