@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask.ext.mako import MakoTemplates
 from lobbypy.views import (
         oid,
         # VIEW FUNCTIONS
@@ -19,6 +20,8 @@ def create_app(**config):
             os.environ['DEV_DATABASE_URI'])
     app.debug = config.get('DEBUG', False)
     app.config['TESTING'] = config.get('TESTING', False)
+
+    mako = MakoTemplates(app)
 
     db.init_app(app)
     oid.init_app(app)

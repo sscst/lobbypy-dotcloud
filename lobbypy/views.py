@@ -6,6 +6,7 @@ from flask import (
         g,
         )
 from flask.ext.openid import OpenID
+from flask.ext.mako import render_template
 
 from lobbypy.models import db, Player
 
@@ -14,7 +15,12 @@ oid = OpenID()
 _steam_id_re = re.compile('steamcommunity.com/openid/id/(.*?)$')
 
 def index():
-    return 'Hello %s!' % session.get('user_id', 'Anonymous')
+    hellouser = 'Hello %s!' % session.get('user_id', 'Anonymous')
+    
+    return render_template('index.mako', **{
+        'section': 'home',
+        'hellouser': hellouser
+    })
 
 @oid.loginhandler
 def login():
