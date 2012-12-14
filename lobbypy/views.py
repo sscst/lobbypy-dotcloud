@@ -8,7 +8,10 @@ from flask import (
 from flask.ext.openid import OpenID
 from flask.ext.mako import render_template
 
+from socketio import socketio_manage
+
 from lobbypy.models import db, Player
+from lobbypy.namespaces import LobbiesNamespace
 
 oid = OpenID()
 
@@ -46,3 +49,5 @@ def logout():
     session.pop('user_id', None)
     return redirect(oid.get_next_url())
 
+def run_socketio(path):
+    socketio_manage(request.environ, {'': LobbiesNamespace})

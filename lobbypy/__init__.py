@@ -7,6 +7,7 @@ from lobbypy.views import (
         index,
         login,
         logout,
+        run_socketio,
         # EVENTS
         before_request,
         )
@@ -30,6 +31,7 @@ def create_app(**config):
     app.add_url_rule('/', view_func=index)
     app.add_url_rule('/login', view_func=login)
     app.add_url_rule('/logout', view_func=logout)
+    app.add_url_rule('/socket.io/<path:path>', view_func=run_socketio)
 
     # Events
     app.before_request(before_request)
