@@ -50,4 +50,4 @@ def logout():
     return redirect(oid.get_next_url())
 
 def run_socketio(path):
-    socketio_manage(request.environ, {'': LobbiesNamespace})
+    socketio_manage(request.environ, {'lobbies': LobbiesNamespace})
