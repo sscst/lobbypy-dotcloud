@@ -36,4 +36,11 @@ def create_app(**config):
     # Events
     app.before_request(before_request)
 
+    # Debug config
+    if app.config['DEBUG']:
+        from werkzeug import SharedDataMiddleware
+        app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
+            '/static': os.path.join(os.path.dirname(__file__), 'static')
+        })
+
     return app
