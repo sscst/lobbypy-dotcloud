@@ -1,4 +1,3 @@
-from .db import db
 from .player import Player
 from .lobby import Lobby, Team, LobbyPlayer
 
@@ -7,5 +6,4 @@ __all__ = [
         'Lobby',
         'Team',
         'LobbyPlayer',
-        'db',
         ]

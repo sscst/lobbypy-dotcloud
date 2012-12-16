@@ -2,8 +2,6 @@ import redis
 from json import dumps, loads, JSONEncoder
 from socketio.namespace import BaseNamespace
 
-from lobbypy.models import Lobby, Player
-
 class LobbiesNamespace(BaseNamespace):
     def listener(self):
         r = redis.StrictRedis()
@@ -26,6 +24,7 @@ class LobbiesNamespace(BaseNamespace):
         self.spawn(self.listener)
 
     def on_get_lobby_listing(self):
+        from lobbypy.models import Lobby
         lobbies = Lobby.query.all()
         lobby_listing = [make_lobby_json(l) for l in lobbies]
         self.emit('lobby_listing', lobby_listing)

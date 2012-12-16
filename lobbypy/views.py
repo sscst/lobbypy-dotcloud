@@ -1,31 +1,31 @@
 import re
 from flask import (
         session,
+        request,
+        Response,
         flash,
         redirect,
         g,
         )
-from flask.ext.openid import OpenID
 from flask.ext.mako import render_template
+from flask.ext.openid import OpenID
+from lobbypy import app, oid
 
 from socketio import socketio_manage
 
-from lobbypy.models import db, Player
-from lobbypy.namespaces import LobbiesNamespace
-
-oid = OpenID()
-
 _steam_id_re = re.compile('steamcommunity.com/openid/id/(.*?)$')
+oid = OpenID(app)
 
+@app.route('/')
 def index():
     hellouser = 'Hello %s!' % session.get('user_id', 'Anonymous')
-    
     return render_template('index.mako', **{
         'section': 'home',
         'hellouser': hellouser
     })
 
 @oid.loginhandler
+@app.route('/login')
 def login():
     if g.player is not None:
         return redirect(oid.get_next_url())
@@ -33,21 +33,27 @@ def login():
 
 @oid.after_login
 def create_or_login(resp):
+    from lobbypy.models import Player
     match = _steam_id_re.search(resp.identity_url)
     g.player = Player.get_or_create(match.group(1))
-    db.session.commit()
     session['user_id'] = g.player.id
     flash('You are logged in as %s' % g.player.steam_id)
     return redirect(oid.get_next_url())
 
+@app.before_request
 def before_request():
+    from lobbypy.models import Player
     g.player = None
     if 'user_id' in session:
         g.player = Player.query.get(session['user_id'])
 
+@app.route('/logout')
 def logout():
     session.pop('user_id', None)
     return redirect(oid.get_next_url())
 
+@app.route('/socket.io/<path:path>')
 def run_socketio(path):
-    socketio_manage(request.environ, {'lobbies': LobbiesNamespace})
+    from lobbypy.namespaces import LobbiesNamespace
+    socketio_manage(request.environ, {'/lobbies': LobbiesNamespace})
+    return Response()

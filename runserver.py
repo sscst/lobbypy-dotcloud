@@ -1,8 +1,9 @@
+from gevent import monkey; monkey.patch_all()
 import os
 from flask.ext.script import Manager, prompt_bool
+from socketio.server import SocketIOServer
 
-from lobbypy import create_app, config_app
-app = create_app()
+from lobbypy import app
 
 manager = Manager(app)
 # Bind to PORT if defined, otherwise default to 5000.
@@ -10,8 +11,7 @@ port = int(os.environ.get('PORT', 5000))
 
 @manager.option('--debug', dest='debug', action='store_const', const=True, default=False)
 def run(debug):
-    config_app(app, DEBUG=debug)
-    app.run(host='0.0.0.0', port=port, debug=debug)
+    SocketIOServer(('', port), app, resource="socket.io").serve_forever()
 
 @manager.command
 def init_db():
