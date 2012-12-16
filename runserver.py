@@ -1,16 +1,17 @@
 import os
 from flask.ext.script import Manager, prompt_bool
 
-from lobbypy import create_app
+from lobbypy import create_app, config_app
 app = create_app()
 
 manager = Manager(app)
 # Bind to PORT if defined, otherwise default to 5000.
 port = int(os.environ.get('PORT', 5000))
 
-@manager.command
-def run():
-    app.run(host='0.0.0.0', port=port)
+@manager.option('--debug', dest='debug', action='store_const', const=True, default=False)
+def run(debug):
+    config_app(app, DEBUG=debug)
+    app.run(host='0.0.0.0', port=port, debug=debug)
 
 @manager.command
 def init_db():
