@@ -8,13 +8,11 @@ from flask import (
         g,
         )
 from flask.ext.mako import render_template
-from flask.ext.openid import OpenID
 from lobbypy import app, oid
 
 from socketio import socketio_manage
 
 _steam_id_re = re.compile('steamcommunity.com/openid/id/(.*?)$')
-oid = OpenID(app)
 
 @app.route('/')
 def index():
@@ -24,8 +22,8 @@ def index():
         'hellouser': hellouser
     })
 
-@oid.loginhandler
 @app.route('/login')
+@oid.loginhandler
 def login():
     if g.player is not None:
         return redirect(oid.get_next_url())
