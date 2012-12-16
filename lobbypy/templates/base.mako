@@ -3,6 +3,7 @@
 <html lang="en">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  ${utils.socketio_link()}
   ## ${utils.css_link("styles.css")}
   ## ${next.css() | trim}
   <title>LobbyPy</title>

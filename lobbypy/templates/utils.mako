@@ -23,3 +23,10 @@
      src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js">
     </script>
 </%def>
+
+<%def name="socketio_link()" filter="trim">
+    <script
+     type="text/javascript"
+     src="/static/socket.io.min.js">
+    </script>
+</%def>
