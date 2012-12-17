@@ -1,21 +1,10 @@
 import redis
 from flask import g, request
 from json import dumps, loads, JSONEncoder
-from socketio.namespace import BaseNamespace
-from lobbypy import app, db
+from lobbypy import db
+from .base import BaseNamespace
 
 class LobbiesNamespace(BaseNamespace):
-    def initialize(self):
-        request = self.request
-        self.ctx = app.request_context(request.environ)
-        self.ctx.push()
-        app.preprocess_request()
-        del self.request
-
-    def disconnect(self, *args, **kwargs):
-        super(LobbiesNamespace, self).disconnect(self, *args, **kwargs)
-        self.ctx.pop()
-
     def listener(self):
         r = redis.StrictRedis()
         r = r.pubsub()
@@ -45,7 +34,6 @@ class LobbiesNamespace(BaseNamespace):
         return True, lobby_listing
 
     def on_create_lobby(self, name, server_info, game_map):
-        print g._get_current_object()
         from lobbypy.models import Lobby
         # TODO: pull/generate password from list
         lobby = Lobby(name, g.player, server_info, game_map, None)
