@@ -70,6 +70,12 @@ class Lobby(db.Model):
             if team.has_player(player):
                 team.set_class(player, class_id)
 
+    def is_ready_player(self, player):
+        for team in self.teams:
+            if team.has_player(player):
+                lp = team.get_lobby_player(player)
+                return lp.ready
+
     def toggle_ready(self, player):
         for team in self.teams:
             if team.has_player(player):
