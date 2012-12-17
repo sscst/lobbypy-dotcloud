@@ -31,7 +31,6 @@ class LobbiesNamespace(BaseNamespace):
 
     def on_get_lobby_listing(self):
         """Get full lobby listing"""
-        from lobbypy.models import Lobby
         lobbies = Lobby.query.all()
         lobby_listing = [make_lobby_json(l) for l in lobbies]
         self.emit('lobby_listing', lobby_listing)
