@@ -8,7 +8,7 @@ from flask import (
         g,
         )
 from flask.ext.mako import render_template
-from lobbypy import app, oid
+from lobbypy import app, oid, db
 
 from socketio import socketio_manage
 
@@ -53,5 +53,7 @@ def logout():
 @app.route('/socket.io/<path:path>')
 def run_socketio(path):
     from lobbypy.namespaces import LobbiesNamespace
-    socketio_manage(request.environ, {'/lobbies': LobbiesNamespace})
+    real_request = request._get_current_object()
+    socketio_manage(request.environ, {'/lobbies': LobbiesNamespace},
+            request=real_request)
     return Response()
