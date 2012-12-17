@@ -52,8 +52,11 @@ def logout():
 
 @app.route('/socket.io/<path:path>')
 def run_socketio(path):
-    from lobbypy.namespaces import LobbiesNamespace
+    from lobbypy.namespaces import LobbiesNamespace, LobbyNamespace
     real_request = request._get_current_object()
-    socketio_manage(request.environ, {'/lobbies': LobbiesNamespace},
-            request=real_request)
+    socketio_manage(request.environ, {
+            '/lobbies': LobbiesNamespace,
+            '/lobby': LobbyNamespace,
+        },
+        request=real_request)
     return Response()
