@@ -2,6 +2,7 @@ import redis
 from flask import g, request
 from json import dumps, loads, JSONEncoder
 from lobbypy import db
+from lobbypy.models import Lobby, Player
 from .base import BaseNamespace
 
 class LobbiesNamespace(BaseNamespace):
@@ -34,12 +35,10 @@ class LobbiesNamespace(BaseNamespace):
         return True, lobby_listing
 
     def on_create_lobby(self, name, server_info, game_map):
-        from lobbypy.models import Lobby
         # TODO: pull/generate password from list
-        lobby = Lobby(name, g.player, server_info, game_map, None)
+        lobby = Lobby(name, g.player, server_info, game_map, 'password')
         db.session.add(lobby)
         db.session.commit()
-        print lobby
         return True, lobby.id
 
 def make_lobby_json(lobby):
