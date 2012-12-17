@@ -7,6 +7,7 @@ from .base import BaseNamespace
 
 class LobbiesNamespace(BaseNamespace):
     def listener(self):
+        """Listen on redis for lobby CUD"""
         r = redis.StrictRedis()
         r = r.pubsub()
 
@@ -23,23 +24,18 @@ class LobbiesNamespace(BaseNamespace):
                     self.emit('create', data['lobby'])
 
     def on_subscribe(self):
+        """Subscribe to lobby CUD listener"""
         self.on_get_lobby_listing()
         self.spawn(self.listener)
         return True
 
     def on_get_lobby_listing(self):
+        """Get full lobby listing"""
         from lobbypy.models import Lobby
         lobbies = Lobby.query.all()
         lobby_listing = [make_lobby_json(l) for l in lobbies]
         self.emit('lobby_listing', lobby_listing)
         return True, lobby_listing
-
-    def on_create_lobby(self, name, server_info, game_map):
-        # TODO: pull/generate password from list
-        lobby = Lobby(name, g.player, server_info, game_map, 'password')
-        db.session.add(lobby)
-        db.session.commit()
-        return True, lobby.id
 
 def make_lobby_json(lobby):
     return dumps(lobby, cls=LobbiesNamespaceJSONEncoder)
