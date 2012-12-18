@@ -1,9 +1,12 @@
 from flask.ext.testing import TestCase
-from lobbypy import create_app, db
+from lobbypy import create_app, config_app
+from lobbypy.utils import db
 
 class LobbyModelTest(TestCase):
     def create_app(self):
-        return create_app(SQLALCHEMY_DATABASE_URI='sqlite://', TESTING=True)
+        app = create_app()
+        config_app(app, SQLALCHEMY_DATABASE_URI='sqlite://', TESTING=True)
+        return app
 
     def setUp(self):
         db.create_all()

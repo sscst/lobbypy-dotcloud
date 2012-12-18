@@ -33,7 +33,6 @@ class LobbiesNamespace(BaseNamespace):
         """Get full lobby listing"""
         lobbies = Lobby.query.all()
         lobby_listing = [make_lobby_json(l) for l in lobbies]
-        self.emit('lobby_listing', lobby_listing)
         return True, lobby_listing
 
 def make_lobby_json(lobby):

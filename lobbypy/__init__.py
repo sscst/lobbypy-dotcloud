@@ -1,16 +1,12 @@
 import os
 from socketio.server import SocketIOServer
 from flask import Flask
-from flask.ext.mako import MakoTemplates
+from lobbypy.utils import db, mako, oid
 
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.openid import OpenID
+def create_app():
+    return Flask(__name__)
 
-app = Flask(__name__)
-mako = MakoTemplates()
-db = SQLAlchemy()
-oid = OpenID()
-def config_app(**config):
+def config_app(app, **config):
     app.secret_key = (config.get('SESSION_KEY', None)
             or os.environ['SESSION_KEY'])
     app.config['SQLALCHEMY_DATABASE_URI'] = (
@@ -22,5 +18,11 @@ def config_app(**config):
     mako.init_app(app)
     db.init_app(app)
     oid.init_app(app)
-    from lobbypy import views
     from lobbypy import models
+    from lobbypy import views
+
+    app.add_url_rule('/', view_func=views.index)
+    app.add_url_rule('/login', view_func=views.login)
+    app.add_url_rule('/logout', view_func=views.logout)
+    app.add_url_rule('/socket.io/<path:path>', view_func=views.run_socketio)
+    app.before_request(views.before_request)

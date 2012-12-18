@@ -1,4 +1,4 @@
-from lobbypy import db
+from lobbypy.utils import db
 from lobbypy.lib import get_player_summary_for_steam_id
 
 class Player(db.Model):

@@ -1,4 +1,4 @@
-from lobbypy import db
+from lobbypy.utils import db
 spectator_table = db.Table('spectator', db.metadata,
         db.Column('lobby_id', db.Integer, db.ForeignKey('lobby.id'), primary_key=True),
         db.Column('player_id', db.Integer, db.ForeignKey('player.id'),

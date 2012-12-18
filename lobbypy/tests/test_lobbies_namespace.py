@@ -74,13 +74,14 @@ class LobbiesNamespaceTest(unittest.TestCase):
                 {'name': 'A'},
                 {'name': 'B'},
                 ]
-        rvs = list(lobbies_json)
+        json_rvs = list(lobbies_json)
         def side_effect(*args, **kwargs):
-            return rvs.pop(0)
+            return json_rvs.pop(0)
         magic_make_lobby_json.side_effect = side_effect
         instance = self._makeOne()
-        instance.on_get_lobby_listing()
-        magic_emit.assert_called_once_with('lobby_listing', lobbies_json)
+        rvs = instance.on_get_lobby_listing()
+        self.assertTrue(rvs[0])
+        self.assertEqual(rvs[1], lobbies_json)
 
     @patch('lobbypy.models.Player._get_persona_name')
     def test_make_lobby_json(self, magic_persona_name):
