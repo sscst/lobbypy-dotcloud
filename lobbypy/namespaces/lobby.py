@@ -6,10 +6,10 @@ from .base import BaseNamespace
 class LobbyNamespace(BaseNamespace):
     def initialize(self):
         self.lobby_id = None
-        self.listener = None
+        self.listener_job = None
 
     def get_initial_acl(self):
-        return ['on_join', 'recv_connect']
+        return set(['on_join', 'recv_connect'])
 
     def listener(self):
         pass
@@ -32,12 +32,14 @@ class LobbyNamespace(BaseNamespace):
         if g.player:
             if self.lobby_id is not None:
                 self.on_leave()
-            lobby.join(player)
+            lobby.join(g.player)
             db.session.commit()
             self.add_acl_method('on_set_team')
+            self.del_acl_method('on_create_lobby')
+            self.del_acl_method('on_join')
         self.add_acl_method('on_leave')
         self.lobby_id = lobby_id
-        self.listener = self.spawn(listener)
+        self.listener_job = self.spawn(self.listener)
         return True
 
     def on_leave(self):
@@ -48,22 +50,26 @@ class LobbyNamespace(BaseNamespace):
             if lobby.owner is g.player:
                 db.session.remove(lobby)
             else:
-                lobby.leave(player)
+                lobby.leave(g.player)
             db.session.commit()
             self.del_acl_method('on_set_team')
-            self.del_acl_method('on_set_class')
-            self.del_acl_method('on_toggle_ready')
+            if 'on_set_class' in self.allowed_methods:
+                self.del_acl_method('on_set_class')
+                self.del_acl_method('on_toggle_ready')
             self.del_acl_method('on_leave')
-        self.listener.kill()
+            self.add_acl_method('on_join')
+            self.add_acl_method('on_create_lobby')
+        self.listener_job.kill()
         self.lobby_id = None
         return True
 
     def on_set_team(self, team_id):
         assert self.lobby_id
+        assert g.player
         lobby = Lobby.query.get(self.lobby_id)
         lobby.set_team(g.player, team_id)
         db.session.commit()
-        if team_id:
+        if team_id is not None:
             self.add_acl_method('on_set_class')
             self.add_acl_method('on_toggle_ready')
         else:
@@ -73,6 +79,7 @@ class LobbyNamespace(BaseNamespace):
 
     def on_set_class(self, class_id):
         assert self.lobby_id
+        assert g.player
         lobby = Lobby.query.get(self.lobby_id)
         lobby.set_class(g.player, class_id)
         db.session.commit()
@@ -80,10 +87,11 @@ class LobbyNamespace(BaseNamespace):
 
     def on_toggle_ready(self):
         assert self.lobby_id
+        assert g.player
         lobby = Lobby.query.get(self.lobby_id)
-        lobby.toggle_ready(player)
+        lobby.toggle_ready(g.player)
         db.session.commit()
-        if lobby.is_ready_player(player):
+        if lobby.is_ready_player(g.player):
             self.del_acl_method('on_set_class')
             self.del_acl_method('on_set_team')
         else:
