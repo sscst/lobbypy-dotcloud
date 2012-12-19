@@ -47,3 +47,13 @@ Developing
 Use `foreman` from the Heroku Toolbelt to run commands and start the
 server with the heroku environment.  See the
 [man page](http://ddollar.github.com/foreman/) for documentation.
+
+### Testing ###
+
+Run the command
+
+    foreman run nosetests
+
+To run the lobbypy-heroku test suite.  To get the coverage of the test suite use
+
+    foreman run nosetests --with-coverage --cover-package=lobbypy
