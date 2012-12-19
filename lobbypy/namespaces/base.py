@@ -7,7 +7,7 @@ class BaseNamespace(Namespace):
         if request:
             self.ctx = current_app.request_context(request.environ)
             self.ctx.push()
-            app.preprocess_request()
+            current_app.preprocess_request()
             del kwargs['request']
         super(BaseNamespace, self).__init__(*args, **kwargs)
 
