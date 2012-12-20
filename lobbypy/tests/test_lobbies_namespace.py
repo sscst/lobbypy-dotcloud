@@ -9,8 +9,10 @@ class LobbiesNamespaceTest(unittest.TestCase):
             environ = {'socketio': MagicMock()}
         return LobbiesNamespace(environ, ns_name)
 
-    def _makeRedisMessage(self, data_type, **data):
-        data['type'] = data_type
+    def _makeRedisMessage(self, event, *args):
+        data = dict()
+        data['event'] = event
+        data['args'] = args
         return {
                 'type': 'message',
                 'data': dumps(data),
@@ -21,48 +23,48 @@ class LobbiesNamespaceTest(unittest.TestCase):
         return make_lobby_json(lobby)
 
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
-    @patch('lobbypy.namespaces.lobbies.redis')
+    @patch('lobbypy.namespaces.base.redis')
     def test_listen_update_message(self, magic_module, magic_method):
         lobby_json = {'name':'Lobby'}
         redis = magic_module.StrictRedis.return_value
         pubsub = redis.pubsub.return_value
 
         pubsub.listen.return_value = [
-                self._makeRedisMessage('update', lobby=lobby_json)]
+                self._makeRedisMessage('update', lobby_json)]
         instance = self._makeOne()
-        instance.listener()
+        instance.listener('/lobby/')
         magic_method.assert_called_once_with('update', lobby_json)
 
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
-    @patch('lobbypy.namespaces.lobbies.redis')
+    @patch('lobbypy.namespaces.base.redis')
     def test_listen_create_message(self, magic_module, magic_method):
         lobby_json = {'name':'Lobby'}
         redis = magic_module.StrictRedis.return_value
         pubsub = redis.pubsub.return_value
 
         pubsub.listen.return_value = [
-                self._makeRedisMessage('create', lobby=lobby_json)]
+                self._makeRedisMessage('create', lobby_json)]
         instance = self._makeOne()
-        instance.listener()
+        instance.listener('/lobby/')
         magic_method.assert_called_once_with('create', lobby_json)
 
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
-    @patch('lobbypy.namespaces.lobbies.redis')
+    @patch('lobbypy.namespaces.base.redis')
     def test_listen_destroy_message(self, magic_module, magic_method):
         redis = magic_module.StrictRedis.return_value
         pubsub = redis.pubsub.return_value
 
         pubsub.listen.return_value = [
-                self._makeRedisMessage('destroy', lobby_id=1)]
+                self._makeRedisMessage('delete', 1)]
         instance = self._makeOne()
-        instance.listener()
-        magic_method.assert_called_once_with('destroy', 1)
+        instance.listener('/lobby/')
+        magic_method.assert_called_once_with('delete', 1)
 
     @patch('lobbypy.namespaces.lobbies.Lobby')
-    @patch('lobbypy.namespaces.lobbies.make_lobby_json')
+    @patch('lobbypy.namespaces.lobbies.make_lobby_dict')
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
     def test_on_get_lobby_listing(self, magic_emit,
-            magic_make_lobby_json, magic_Lobby):
+            magic_make_lobby_dict, magic_Lobby):
         from lobbypy.models import Lobby, Player
         p = Player('0')
         lobbies = [
@@ -70,18 +72,18 @@ class LobbiesNamespaceTest(unittest.TestCase):
                 Lobby('B', p, '', '', ''),
                 ]
         magic_Lobby.query.all.return_value = lobbies
-        lobbies_json = [
+        lobbies_dict = [
                 {'name': 'A'},
                 {'name': 'B'},
                 ]
-        json_rvs = list(lobbies_json)
+        json_rvs = list(lobbies_dict)
         def side_effect(*args, **kwargs):
             return json_rvs.pop(0)
-        magic_make_lobby_json.side_effect = side_effect
+        magic_make_lobby_dict.side_effect = side_effect
         instance = self._makeOne()
         rvs = instance.on_get_lobby_listing()
         self.assertTrue(rvs[0])
-        self.assertEqual(rvs[1], lobbies_json)
+        self.assertEqual(rvs[1], lobbies_dict)
 
     @patch('lobbypy.models.Player._get_persona_name')
     def test_make_lobby_json(self, magic_persona_name):

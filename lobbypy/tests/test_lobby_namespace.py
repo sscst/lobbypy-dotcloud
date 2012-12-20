@@ -49,6 +49,7 @@ class LobbyNamespaceTest(TestCase):
         instance = self._makeOne()
         p = Player('0')
         g.player = p
+        instance.recv_connect()
         rvs = instance.on_create_lobby('test', 'test', 'test')
         lobby = Lobby.query.first()
         self.assertTrue(rvs[0])

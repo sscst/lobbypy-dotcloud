@@ -1,9 +1,9 @@
 from flask import g
 from lobbypy import db
 from lobbypy.models import Lobby
-from .base import BaseNamespace
+from .base import BaseNamespace, RedisListenerMixin, RedisBroadcastMixin
 
-class LobbyNamespace(BaseNamespace):
+class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
     def initialize(self):
         self.lobby_id = None
         self.listener_job = None
@@ -11,22 +11,29 @@ class LobbyNamespace(BaseNamespace):
     def get_initial_acl(self):
         return set(['on_join', 'recv_connect'])
 
-    def listener(self):
-        pass
-
     def recv_connect(self):
         if g.player:
             self.add_acl_method('on_create_lobby')
 
     def on_create_lobby(self, name, server_info, game_map):
-        """Create lobby"""
+        """Create and join lobby"""
+        assert g.player
+        assert not self.lobby_id
         # TODO: pull/generate password from list
         lobby = Lobby(name, g.player, server_info, game_map, 'password')
+        lobby.join(g.player)
         db.session.add(lobby)
         db.session.commit()
+        self.add_acl_method('on_set_team')
+        self.add_acl_method('on_leave')
+        self.del_acl_method('on_create_lobby')
+        self.del_acl_method('on_join')
+        self.lobby_id = lobby.id
+        self.listener_job = self.spawn(self.listener, '/lobby/%d' % lobby.id)
         return True, lobby.id
 
     def on_join(self, lobby_id):
+        """Join lobby"""
         # Leave the old lobby if we have not
         lobby = Lobby.query.get(lobby_id)
         if g.player:
@@ -39,19 +46,21 @@ class LobbyNamespace(BaseNamespace):
             self.del_acl_method('on_join')
         self.add_acl_method('on_leave')
         self.lobby_id = lobby_id
-        self.listener_job = self.spawn(self.listener)
+        self.listener_job = self.spawn(self.listener, '/lobby/%d' % lobby_id)
         return True
 
     def on_leave(self):
+        """Leave lobby"""
         assert self.lobby_id
-        assert self.listener
+        assert self.listener_job
         lobby = Lobby.query.get(self.lobby_id)
         if g.player:
             if lobby.owner is g.player:
                 db.session.remove(lobby)
+                db.session.commit()
             else:
                 lobby.leave(g.player)
-            db.session.commit()
+                db.session.commit()
             self.del_acl_method('on_set_team')
             if 'on_set_class' in self.allowed_methods:
                 self.del_acl_method('on_set_class')
