@@ -1,6 +1,6 @@
 from flask import g
-from lobbypy import db
-from lobbypy.models import Lobby
+from lobbypy.models import Lobby, make_lobby_item_dict, make_lobby_dict
+from lobbypy.utils import db
 from .base import BaseNamespace, RedisListenerMixin, RedisBroadcastMixin
 
 class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
@@ -15,6 +15,26 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         if g.player:
             self.add_acl_method('on_create_lobby')
 
+    def disconnect(self, *args, **kwargs):
+        if g.player:
+            if lobby.owner is g.player:
+                db.session.remove(lobby)
+                db.session.commit()
+                self.broadcast_event('/lobby/', 'delete', lobby_id)
+                self.broadcast_event('/lobby/%d' % lobby_id, 'delete')
+            else:
+                lobby.leave(g.player)
+                db.session.commit()
+                self.broadcast_event('/lobby/', 'update', lobby)
+                self.broadcast_event('/lobby/%d', 'leave', g.player)
+        super(LobbyNamespace, self).disconnect(*args, **kwargs)
+
+    def on_redis_update(self, lobby_info):
+        self.emit('update', lobby_info)
+
+    def on_redis_delete(self):
+        self.emit('delete')
+
     def on_create_lobby(self, name, server_info, game_map):
         """Create and join lobby"""
         assert g.player
@@ -24,6 +44,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         lobby.join(g.player)
         db.session.add(lobby)
         db.session.commit()
+        self.broadcast_event('create', make_lobby_item_dict(lobby))
         self.add_acl_method('on_set_team')
         self.add_acl_method('on_leave')
         self.del_acl_method('on_create_lobby')
@@ -38,9 +59,14 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         lobby = Lobby.query.get(lobby_id)
         if g.player:
             if self.lobby_id is not None:
+                # TODO: do leave logic
                 self.on_leave()
             lobby.join(g.player)
             db.session.commit()
+            self.broadcast_event('/lobby/', 'update',
+                    make_lobby_item_dict(lobby))
+            self.broadcast_event('/lobby/%d' % lobby_id, 'update',
+                    make_lobby_dict(lobby))
             self.add_acl_method('on_set_team')
             self.del_acl_method('on_create_lobby')
             self.del_acl_method('on_join')
@@ -58,9 +84,15 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
             if lobby.owner is g.player:
                 db.session.remove(lobby)
                 db.session.commit()
+                self.broadcast_event('/lobby/', 'delete', lobby_id)
+                self.broadcast_event('/lobby/%d' % lobby_id, 'delete')
             else:
                 lobby.leave(g.player)
                 db.session.commit()
+                self.broadcast_event('/lobby/', 'update',
+                        make_lobby_item_dict(lobby))
+                self.broadcast_event('/lobby/%d', 'update',
+                        make_lobby_dict(lobby))
             self.del_acl_method('on_set_team')
             if 'on_set_class' in self.allowed_methods:
                 self.del_acl_method('on_set_class')
@@ -78,6 +110,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         lobby = Lobby.query.get(self.lobby_id)
         lobby.set_team(g.player, team_id)
         db.session.commit()
+        self.broadcast_event('/lobby/', 'update', make_lobby_item_dict(lobby))
+        self.broadcast_event('/lobby/%d', 'update', make_lobby_dict(lobby))
         if team_id is not None:
             self.add_acl_method('on_set_class')
             self.add_acl_method('on_toggle_ready')
@@ -92,6 +126,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         lobby = Lobby.query.get(self.lobby_id)
         lobby.set_class(g.player, class_id)
         db.session.commit()
+        self.broadcast_event('/lobby/', 'update', make_lobby_item_dict(lobby))
+        self.broadcast_event('/lobby/%d', 'update', make_lobby_dict(lobby))
         return True
 
     def on_toggle_ready(self):
@@ -100,6 +136,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         lobby = Lobby.query.get(self.lobby_id)
         lobby.toggle_ready(g.player)
         db.session.commit()
+        self.broadcast_event('/lobby/%d', 'update', make_lobby_dict(lobby))
         if lobby.is_ready_player(g.player):
             self.del_acl_method('on_set_class')
             self.del_acl_method('on_set_team')

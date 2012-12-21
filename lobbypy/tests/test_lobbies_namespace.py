@@ -18,10 +18,6 @@ class LobbiesNamespaceTest(unittest.TestCase):
                 'data': dumps(data),
                 }
 
-    def _callFut(self, lobby):
-        from lobbypy.namespaces.lobbies import make_lobby_json
-        return make_lobby_json(lobby)
-
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
     @patch('lobbypy.namespaces.base.redis')
     def test_listen_update_message(self, magic_module, magic_method):
@@ -61,7 +57,7 @@ class LobbiesNamespaceTest(unittest.TestCase):
         magic_method.assert_called_once_with('delete', 1)
 
     @patch('lobbypy.namespaces.lobbies.Lobby')
-    @patch('lobbypy.namespaces.lobbies.make_lobby_dict')
+    @patch('lobbypy.namespaces.lobbies.make_lobby_item_dict')
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
     def test_on_get_lobby_listing(self, magic_emit,
             magic_make_lobby_dict, magic_Lobby):
@@ -84,28 +80,3 @@ class LobbiesNamespaceTest(unittest.TestCase):
         rvs = instance.on_get_lobby_listing()
         self.assertTrue(rvs[0])
         self.assertEqual(rvs[1], lobbies_dict)
-
-    @patch('lobbypy.models.Player._get_persona_name')
-    def test_make_lobby_json(self, magic_persona_name):
-        magic_persona_name.return_value = 'Name'
-        from lobbypy.models import Lobby, Player
-        p = Player('0')
-        p.id = 0
-        p_dict = {
-                'id': 0,
-                'name': 'Name',
-                'steam_id': '0',
-                }
-        l = Lobby('A', p, '', '', '')
-        l.id = 0
-        l_dict = {
-                'id': 0,
-                'name': 'A',
-                'owner': p_dict,
-                'game_map': '',
-                'players': 0,
-                'spectators': 0,
-                }
-        rv = self._callFut(l)
-        from json import dumps
-        self.assertEqual(dumps(l_dict), rv)

@@ -45,17 +45,27 @@ class LobbyNamespaceTest(TestCase):
         rv = instance.get_initial_acl()
         self.assertEqual(rv, set(['on_join', 'recv_connect']))
 
-    def test_on_create_lobby(self):
+    @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')
+    @patch('lobbypy.namespaces.lobby.make_lobby_item_dict')
+    def test_on_create_lobby(self, magic_make, magic_broadcast):
         instance = self._makeOne()
         p = Player('0')
         g.player = p
+        lobby_dict = {
+                'name': 'test'
+                }
+        magic_make.return_value = lobby_dict
         instance.recv_connect()
         rvs = instance.on_create_lobby('test', 'test', 'test')
         lobby = Lobby.query.first()
         self.assertTrue(rvs[0])
         self.assertEqual(rvs[1], lobby.id)
+        magic_broadcast.assert_called_once_with('create', lobby_dict)
 
-    def test_on_join(self):
+    @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')
+    @patch('lobbypy.namespaces.lobby.make_lobby_item_dict')
+    @patch('lobbypy.namespaces.lobby.make_lobby_dict')
+    def test_on_join(self, magic_make, magic_item_make, magic_broadcast):
         instance = self._makeOne()
         o = Player('')
         l = Lobby('', o, '', '', '')
@@ -75,7 +85,10 @@ class LobbyNamespaceTest(TestCase):
         self.assertEqual(instance.listener_job, 'jerb')
         self.assertEqual(instance.lobby_id, l.id)
 
-    def test_on_leave(self):
+    @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')
+    @patch('lobbypy.namespaces.lobby.make_lobby_item_dict')
+    @patch('lobbypy.namespaces.lobby.make_lobby_dict')
+    def test_on_leave(self, magic_make, magic_item_make, magic_broadcast):
         instance = self._makeOne()
         o = Player('')
         l = Lobby('', o, '', '', '')
@@ -97,7 +110,10 @@ class LobbyNamespaceTest(TestCase):
         self.assertEqual(len(l.spectators), 0)
         instance.listener_job.kill.assert_called_once()
 
-    def test_on_set_team(self):
+    @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')
+    @patch('lobbypy.namespaces.lobby.make_lobby_item_dict')
+    @patch('lobbypy.namespaces.lobby.make_lobby_dict')
+    def test_on_set_team(self, magic_make, magic_item_make, magic_broadcast):
         instance = self._makeOne()
         o = Player('')
         l = Lobby('', o, '', '', '')
@@ -119,7 +135,10 @@ class LobbyNamespaceTest(TestCase):
             'recv_connect', 'on_set_class', 'on_toggle_ready', 'on_set_team']))
         self.assertEqual(l.teams[0].players[0].player, p)
 
-    def test_on_set_class(self):
+    @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')
+    @patch('lobbypy.namespaces.lobby.make_lobby_item_dict')
+    @patch('lobbypy.namespaces.lobby.make_lobby_dict')
+    def test_on_set_class(self, magic_make, magic_item_make, magic_broadcast):
         instance = self._makeOne()
         o = Player('')
         l = Lobby('', o, '', '', '')
@@ -141,7 +160,9 @@ class LobbyNamespaceTest(TestCase):
             'recv_connect', 'on_set_class', 'on_toggle_ready', 'on_set_team']))
         self.assertEqual(l.teams[0].players[0].class_id, 0)
 
-    def test_on_toggle_ready(self):
+    @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')
+    @patch('lobbypy.namespaces.lobby.make_lobby_dict')
+    def test_on_toggle_ready(self, magic_make, magic_broadcast):
         instance = self._makeOne()
         o = Player('')
         l = Lobby('', o, '', '', '')
