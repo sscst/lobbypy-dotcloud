@@ -34,6 +34,10 @@ class Lobby(db.Model):
     def spectator_count(self):
         return len(self.spectators)
 
+    def has_player(self, player):
+        return player in self.spectators or any([t.has_player(player) for t in
+            self.teams])
+
     def join(self, player):
         self.spectators.append(player)
 
