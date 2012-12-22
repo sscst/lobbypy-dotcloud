@@ -1,4 +1,41 @@
 def make_lobby_item_dict(l):
+    """lobby_item schema:
+       {
+           "name": "loboby_item",
+           "properties": {
+               "id" {
+                   "description": "Id of the Lobby",
+                   "type": "number",
+                   "required": true
+               },
+               "name": {
+                   "description": "Name of the Lobby",
+                   "type": "string",
+                   "required": true
+               },
+               "owner": {
+                   "description": "Owner of the Lobby",
+                   "type": PLAYER_SCHEMA,
+                   "required": true
+               },
+               "game_map": {
+                   "description": "Map for the Lobby",
+                   "type": "string",
+                   "required": true
+               },
+               "player_count": {
+                   "description": "Count of players in the Lobby",
+                   "type": "number",
+                   "required": true
+               },
+               "spectator_count": {
+                   "description": "Count of the spectators in the Lobby",
+                   "type": "number"
+                   "required": true
+               }
+           }
+       }
+    """
     return {
             'id': l.id,
             'name': l.name,
@@ -9,6 +46,49 @@ def make_lobby_item_dict(l):
             }
 
 def make_lobby_dict(l):
+    """lobby_item schema:
+       {
+           "name": "loboby_item",
+           "properties": {
+               "id": {
+                   "description": "Id of the Lobby",
+                   "type": "number",
+                   "required": true
+               },
+               "name": {
+                   "description": "Name of the Lobby",
+                   "type": "string",
+                   "required": true
+               },
+               "owner": {
+                   "description": "Owner of the Lobby",
+                   "type": PLAYER_SCHEMA,
+                   "required": true
+               },
+               "game_map": {
+                   "description": "Map for the Lobby",
+                   "type": "string",
+                   "required": true
+               },
+               "teams": {
+                   "description": "Teams in the Lobby",
+                   "type": "array",
+                   "items": {
+                       "type": TEAM_SCHEMA
+                   },
+                   "required": true
+               },
+               "spectators": {
+                   "description": "Spectators in the Lobby",
+                   "type": "array",
+                   "items": {
+                       "type": PLAYER_SCHEMA
+                   },
+                   "required": true
+               }
+           }
+       }
+    """
     return {
             'id': l.id,
             'name': l.name,
@@ -19,6 +99,31 @@ def make_lobby_dict(l):
             }
 
 def make_team_dict(i, t):
+    """team schema:
+       {
+           "name": "team",
+           "properties": {
+               "id": {
+                   "description": "Id of the Team",
+                   "type": "number",
+                   "required": true
+               },
+               "name": {
+                   "description": "Name of the Team",
+                   "type": "string",
+                   "required": true
+               },
+               "players": {
+                   "description": "List of Players in the Team",
+                   "type": "array",
+                   "items": {
+                       "type": LOBBY_PLAYER_SCHEMA
+                   },
+                   "required": true
+               }
+           }
+       }
+    """
     return {
             'id': i,
             'name': t.name,
@@ -26,6 +131,28 @@ def make_team_dict(i, t):
             }
 
 def make_lobby_player_dict(lp):
+    """lobby_player schema:
+        {
+            "name": "lobby_player",
+            "properties": {
+                "class_id": {
+                    "description": "Class for the Lobby Player",
+                    "type": "string",
+                    "required": true
+                },
+                "ready": {
+                    "description": "Ready state for the Lobby Player",
+                    "type": "boolean",
+                    "required": true
+                },
+                "player": {
+                    "description": "Player for this Lobby Player",
+                    "type": PLAYER_SCHEMA,
+                    "required": true
+                }
+            }
+        }
+    """
     return {
             'class_id': lp.class_id,
             'ready': lp.ready,
@@ -33,6 +160,28 @@ def make_lobby_player_dict(lp):
             }
 
 def make_player_dict(p):
+    """player schema:
+        {
+            "name": "player",
+            "properties": {
+                "id": {
+                    "description": "Id of the Player",
+                    "type": "number",
+                    "required": true
+                },
+                "steam_id": {
+                    "description": "Steam ID for the Player",
+                    "type": "string",
+                    "required": true
+                },
+                "name": {
+                    "description": "Name of the Player pulled from Steam",
+                    "type": "string",
+                    "required": true
+                }
+            }
+        }
+    """
     return {
             'id': p.id,
             'steam_id': p.steam_id,
