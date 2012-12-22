@@ -20,7 +20,7 @@ class BaseNamespace(Namespace):
 class RedisBroadcastMixin(object):
     def broadcast_event(self, ns, event, *args):
         r = redis.Redis()
-        r.publish(ns, dict(event=event, args=args))
+        r.publish(ns, dumps(dict(event=event, args=args)))
 
 class RedisListenerMixin(object):
     def listener(self, ns):
