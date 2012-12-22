@@ -1,6 +1,7 @@
 from flask import g
 from lobbypy.models import Lobby, make_lobby_item_dict, make_lobby_dict
 from lobbypy.utils import db
+from lobbypy.controllers import leave_or_delete_all_lobbies
 from .base import BaseNamespace, RedisListenerMixin, RedisBroadcastMixin
 
 class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
@@ -16,7 +17,9 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
             self.add_acl_method('on_create_lobby')
 
     def disconnect(self, *args, **kwargs):
-        if g.player:
+        """On disconnect leave lobby"""
+        if g.player and self.lobby_id:
+            lobby = Lobby.query.get(self.lobby_id)
             if lobby.owner is g.player:
                 db.session.remove(lobby)
                 db.session.commit()
@@ -25,26 +28,47 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
             else:
                 lobby.leave(g.player)
                 db.session.commit()
-                self.broadcast_event('/lobby/', 'update', lobby)
-                self.broadcast_event('/lobby/%d', 'leave', g.player)
+                self.broadcast_event('/lobby/', 'update',
+                        make_lobby_item_dict(lobby))
+                self.broadcast_event('/lobby/%d', 'update',
+                        make_lobby_dict(lobby))
         super(LobbyNamespace, self).disconnect(*args, **kwargs)
 
     def on_redis_update(self, lobby_info):
-        self.emit('update', lobby_info)
+        p_ids = [p[id] for p in lobby_info['spectators']]
+        p_ids.extend([lp['player']['id'] for lp in [t['players'] for t in
+            teams]])
+        if not g.player or g.player.id in p_ids:
+            self.emit('update', lobby_info)
+        else:
+            self.emit('leave')
 
     def on_redis_delete(self):
         self.emit('delete')
+
+    def broadcast_leave_or_delete(self, lobby, is_delete):
+        if is_delete:
+            self.broadcast_event('/lobby/', 'delete', lobby.id)
+            self.broadcast_event('/lobby/%d', 'delete', lobby.id)
+        else:
+            self.broadcast_event('/lobby/', 'update',
+                    make_lobby_item_dict(lobby))
+            self.broadcast_event('/lobby/%d', 'update', make_lobby_dict(lobby))
 
     def on_create_lobby(self, name, server_info, game_map):
         """Create and join lobby"""
         assert g.player
         assert not self.lobby_id
+        # Leave or delete old lobbies
+        lobby_deletes = leave_or_delete_all_lobbies(g.player)
         # TODO: pull/generate password from list
         lobby = Lobby(name, g.player, server_info, game_map, 'password')
         lobby.join(g.player)
         db.session.add(lobby)
         db.session.commit()
-        self.broadcast_event('create', make_lobby_item_dict(lobby))
+        self.broadcast_event('/lobby/', 'create', make_lobby_item_dict(lobby))
+        # Send leave or deletes
+        [self.broadcast_leave_or_delete(*l_d) for l_d in lobby_deletes]
         self.add_acl_method('on_set_team')
         self.add_acl_method('on_leave')
         self.del_acl_method('on_create_lobby')
@@ -55,18 +79,18 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
 
     def on_join(self, lobby_id):
         """Join lobby"""
-        # Leave the old lobby if we have not
         lobby = Lobby.query.get(lobby_id)
         if g.player:
-            if self.lobby_id is not None:
-                # TODO: do leave logic
-                self.on_leave()
+            # Leave or delete old lobbies
+            lobby_deletes = leave_or_delete_all_lobbies(g.player)
             lobby.join(g.player)
             db.session.commit()
             self.broadcast_event('/lobby/', 'update',
                     make_lobby_item_dict(lobby))
             self.broadcast_event('/lobby/%d' % lobby_id, 'update',
                     make_lobby_dict(lobby))
+            # Send leave or deletes
+            [self.broadcast_leave_or_delete(*l_d) for l_d in lobby_deletes]
             self.add_acl_method('on_set_team')
             self.del_acl_method('on_create_lobby')
             self.del_acl_method('on_join')

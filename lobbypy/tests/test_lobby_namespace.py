@@ -60,7 +60,7 @@ class LobbyNamespaceTest(TestCase):
         lobby = Lobby.query.first()
         self.assertTrue(rvs[0])
         self.assertEqual(rvs[1], lobby.id)
-        magic_broadcast.assert_called_once_with('create', lobby_dict)
+        magic_broadcast.assert_called_once_with('/lobby/', 'create', lobby_dict)
 
     @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')
     @patch('lobbypy.namespaces.lobby.make_lobby_item_dict')
