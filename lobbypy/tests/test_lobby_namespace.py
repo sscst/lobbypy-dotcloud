@@ -45,9 +45,13 @@ class LobbyNamespaceTest(TestCase):
         rv = instance.get_initial_acl()
         self.assertEqual(rv, set(['on_join', 'recv_connect']))
 
+    @patch('lobbypy.namespaces.lobby.check_players')
+    @patch('lobbypy.namespaces.lobby.check_map')
+    @patch('lobbypy.namespaces.lobby.connect')
     @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')
     @patch('lobbypy.namespaces.lobby.make_lobby_item_dict')
-    def test_on_create_lobby(self, magic_make, magic_broadcast):
+    def test_on_create_lobby(self, magic_make, magic_broadcast, magic_connect,
+            magic_check_map, magic_check_players):
         instance = self._makeOne()
         p = Player('0')
         g.player = p
@@ -56,6 +60,9 @@ class LobbyNamespaceTest(TestCase):
                 }
         magic_make.return_value = lobby_dict
         instance.recv_connect()
+        server = magic_connect.return_value
+        magic_check_map.return_value = True
+        magic_check_players.return_value = True
         rvs = instance.on_create_lobby('test', 'test', 'test')
         lobby = Lobby.query.first()
         self.assertTrue(rvs[0])

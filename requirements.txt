@@ -22,5 +22,6 @@ nose==1.2.1
 psycopg2==2.4.5
 python-openid==2.2.5
 redis==2.7.2
+srcdspy==1.0
 twill==0.9
 wsgiref==0.1.2
