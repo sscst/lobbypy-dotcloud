@@ -1,4 +1,4 @@
-from flask import g
+from flask import g, current_app
 from srcdspy import RCON_Error
 from lobbypy.models import Lobby, make_lobby_item_dict, make_lobby_dict
 from lobbypy.utils import db
@@ -72,18 +72,19 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         assert g.player
         assert not self.lobby_id
         # Check server
-        try:
-            server = connect(server_info)
-        except RCON_Error:
-            return False, 'bad_pass'
-        except Exception:
-            return False, 'server_issue'
-        else:
-            if not check_map(server):
-                return False, 'map_dne'
-            # TODO: ask if you want to kick players
-            if not check_players(server):
-                return False, 'players'
+        if getattr(current_app, 'check_server', True):
+            try:
+                server = connect(server_info)
+            except RCON_Error:
+                return False, 'bad_pass'
+            except Exception:
+                return False, 'server_issue'
+            else:
+                if not check_map(server):
+                    return False, 'map_dne'
+                # TODO: ask if you want to kick players
+                if not check_players(server):
+                    return False, 'players'
         # Leave or delete old lobbies
         lobby_deletes = leave_or_delete_all_lobbies(g.player)
         # TODO: pull/generate password from list
