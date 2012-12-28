@@ -1,5 +1,5 @@
 from flask import g, current_app
-from srcdspy import RCON_Error
+from srcdspy.rcon import RconException
 from lobbypy.models import Lobby, make_lobby_item_dict, make_lobby_dict
 from lobbypy.utils import db
 from lobbypy.controllers import leave_or_delete_all_lobbies
@@ -75,7 +75,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         if getattr(current_app, 'check_server', True):
             try:
                 server = connect(server_info)
-            except RCON_Error:
+            except RconException:
                 return False, 'bad_pass'
             except Exception:
                 return False, 'server_issue'
