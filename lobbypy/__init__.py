@@ -10,8 +10,8 @@ def config_app(app, **config):
     app.secret_key = (config.get('SESSION_KEY', None)
             or os.environ['SESSION_KEY'])
     app.config['SQLALCHEMY_DATABASE_URI'] = (
-            config.get('DEV_DATABASE_URI', None)
-            or os.environ['DEV_DATABASE_URI'])
+            config.get('SQLALCHEMY_DATABASE_URI', None)
+            or os.environ['SQLALCHEMY_DATABASE_URI'])
     app.debug = config.get('DEBUG', None) or False
     app.config['TESTING'] = config.get('TESTING', None) or False
 
