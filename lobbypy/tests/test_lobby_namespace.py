@@ -74,13 +74,14 @@ class LobbyNamespaceTest(TestCase):
     @patch('lobbypy.namespaces.lobby.make_lobby_dict')
     def test_on_join(self, magic_make, magic_item_make, magic_broadcast):
         instance = self._makeOne()
-        o = Player('')
+        o = Player('0')
+        p = Player('1')
         l = Lobby('', o, '', '', '')
         db.session.add(o)
         db.session.add(l)
+        db.session.add(p)
         db.session.commit()
-        p = Player('0')
-        instance.ctx.g.player = p
+        g.player = p
         instance.recv_connect()
         instance.spawn.return_value = 'jerb'
         rv = instance.on_join(l.id)
