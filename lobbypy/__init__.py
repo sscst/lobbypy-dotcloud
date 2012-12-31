@@ -12,8 +12,9 @@ def config_app(app, **config):
     app.config['SQLALCHEMY_DATABASE_URI'] = (
             config.get('SQLALCHEMY_DATABASE_URI', None)
             or os.environ['SQLALCHEMY_DATABASE_URI'])
-    app.debug = config.get('DEBUG', None) or False
-    app.config['TESTING'] = config.get('TESTING', None) or False
+    app.debug = config.get('DEBUG', False)
+    app.config['TESTING'] = config.get('TESTING', False)
+    app.config['RCON_CHECK_SERVER'] = config.get('RCON_CHECK_SERVER', True)
 
     mako.init_app(app)
     db.init_app(app)

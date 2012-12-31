@@ -10,9 +10,11 @@ manager = Manager(app)
 # Bind to PORT if defined, otherwise default to 5000.
 port = int(os.environ.get('PORT', 5000))
 
+@manager.option('--no-rcon-check', dest='rcon_check', action='store_const',
+        const=True, default=False)
 @manager.option('--debug', dest='debug', action='store_const', const=True, default=False)
-def run(debug):
-    config_app(app, DEBUG=debug)
+def run(debug, rcon_check):
+    config_app(app, DEBUG=debug, RCON_CHECK_SERVER=not rcon_check)
     SocketIOServer(('', port), app, resource="socket.io").serve_forever()
 
 @manager.command

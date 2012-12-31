@@ -72,7 +72,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         assert g.player
         assert not self.lobby_id
         # Check server
-        if getattr(current_app, 'check_server', True):
+        if current_app.config.get('RCON_CHECK_SERVER', True):
             try:
                 server = connect(server_info)
             except RconException:
