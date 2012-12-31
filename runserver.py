@@ -14,6 +14,10 @@ port = int(os.environ.get('PORT', 5000))
         const=True, default=False)
 @manager.option('--debug', dest='debug', action='store_const', const=True, default=False)
 def run(debug, rcon_check):
+    from random import randint
+    from asciiart import images, title
+    print images[randint(0, len(images) - 1)]
+    print title
     config_app(app, DEBUG=debug, RCON_CHECK_SERVER=not rcon_check)
     SocketIOServer(('', port), app, resource="socket.io").serve_forever()
 
