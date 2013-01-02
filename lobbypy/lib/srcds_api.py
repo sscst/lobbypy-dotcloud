@@ -25,7 +25,7 @@ def check_map(source_rcon, game_map):
     i = resp.find('PENDING')
     if i < 0:
         raise RconException("Bad Response")
-    elif resp.find('PENDING'), i+1 != -1:
+    elif resp.find('PENDING', i+1) != -1:
         return False
     return True
 
