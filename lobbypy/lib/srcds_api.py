@@ -1,21 +1,37 @@
 from srcdspy import SourceRcon
+from srcdspy.rcon import RconException
 
-def connect(server_info):
+def connect_rcon(server_info):
     rcon_pass, server_info = rcon_info.split('@')
     rcon_server_ip, rcon_server_port = server_info.split(':')
-    s = SourceRcon()
-    s.connect((rcon_server_ip, rcon_server_port), rcon_pass)
-    return s
+    sr = SourceRcon()
+    sr.connect((rcon_server_ip, rcon_server_port), rcon_pass)
+    return sr
 
-def check_map(server, game_map):
+def connect_query(server_info):
+    rcon_pass, server_info = rcon_info.split('@')
+    rcon_server_ip, rcon_server_port = server_info.split(':')
+    sq = SourceRcon()
+    sq.connect((rcon_server_ip, rcon_server_port))
+    return sq
+
+def check_map(source_rcon, game_map):
     """
     Check that the map exists on the server
     """
-    return False
+    resp = source_rcon.rcon('maps %s.bsp' % game_map)
+    if len(resp) == 0:
+        return False
+    i = resp.find('PENDING')
+    if i < 0:
+        raise RconException("Bad Response")
+    elif resp.find('PENDING'), i+1 != -1:
+        return False
+    return True
 
-def check_players(server):
+def check_players(source_query):
     """
     Check that there are no players on the server (except STV bots)
     and that enough slots are available.
     """
-    return False
+    return len(source_query.player()) == 0

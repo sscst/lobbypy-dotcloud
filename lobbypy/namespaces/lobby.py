@@ -84,17 +84,20 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         # Check server
         if current_app.config.get('RCON_CHECK_SERVER', True):
             try:
-                server = connect(server_info)
+                sr = connect_rcon(server_info)
+                sq = connect_query(server_info)
             except RconException:
                 return False, 'bad_pass'
             except Exception:
                 return False, 'server_issue'
             else:
-                if not check_map(server):
+                if not check_map(sr):
                     return False, 'map_dne'
                 # TODO: ask if you want to kick players
-                if not check_players(server):
+                if not check_players(sq):
                     return False, 'players'
+                sr.close()
+                sq.close()
         # Leave or delete old lobbies
         lobby_deletes = leave_or_delete_all_lobbies(g.player)
         # TODO: pull/generate password from list
