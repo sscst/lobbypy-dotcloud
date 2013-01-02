@@ -47,11 +47,12 @@ class LobbyNamespaceTest(TestCase):
 
     @patch('lobbypy.namespaces.lobby.check_players')
     @patch('lobbypy.namespaces.lobby.check_map')
-    @patch('lobbypy.namespaces.lobby.connect')
+    @patch('lobbypy.namespaces.lobby.connect_query')
+    @patch('lobbypy.namespaces.lobby.connect_rcon')
     @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')
     @patch('lobbypy.namespaces.lobby.make_lobby_item_dict')
-    def test_on_create_lobby(self, magic_make, magic_broadcast, magic_connect,
-            magic_check_map, magic_check_players):
+    def test_on_create_lobby(self, magic_make, magic_broadcast,
+            magic_connect_rcon, magic_connect_query, magic_check_map, magic_check_players):
         instance = self._makeOne()
         p = Player('0')
         g.player = p
@@ -60,7 +61,6 @@ class LobbyNamespaceTest(TestCase):
                 }
         magic_make.return_value = lobby_dict
         instance.recv_connect()
-        server = magic_connect.return_value
         magic_check_map.return_value = True
         magic_check_players.return_value = True
         rvs = instance.on_create_lobby('test', 'test', 'test')
@@ -184,7 +184,7 @@ class LobbyNamespaceTest(TestCase):
         db.session.add(p)
         db.session.commit()
         instance.lobby_id = l.id
-        instance.ctx.g.player = p
+        g.player = p
         instance.allowed_methods = set(['on_leave',
             'recv_connect', 'on_set_team', 'on_set_class', 'on_toggle_ready'])
         instance.on_toggle_ready()
@@ -194,3 +194,69 @@ class LobbyNamespaceTest(TestCase):
 
     def test_on_start(self):
         pass
+
+    @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')
+    @patch('lobbypy.namespaces.lobby.make_lobby_item_dict')
+    @patch('lobbypy.namespaces.lobby.make_lobby_dict')
+    def test_on_kick(self, magic_make, magic_item_make, magic_broadcast):
+        instance = self._makeOne()
+        o = Player('')
+        l = Lobby('', o, '', '', '')
+        t = Team('Red')
+        l.teams.append(t)
+        p = Player('0')
+        t.append_player(p)
+        db.session.add(o)
+        db.session.add(l)
+        db.session.add(t)
+        db.session.add(p)
+        db.session.commit()
+        instance.lobby_id = l.id
+        g.player = o
+        instance.on_kick(p.id)
+        l = db.session.merge(l)
+        self.assertEqual(len(l.teams[0]), 0)
+
+    @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')
+    @patch('lobbypy.namespaces.lobby.make_lobby_item_dict')
+    @patch('lobbypy.namespaces.lobby.make_lobby_dict')
+    def test_on_set_team_name(self, magic_make, magic_item_make, magic_broadcast):
+        instance = self._makeOne()
+        o = Player('')
+        l = Lobby('', o, '', '', '')
+        t = Team('Red')
+        l.teams.append(t)
+        p = Player('0')
+        t.append_player(p)
+        db.session.add(o)
+        db.session.add(l)
+        db.session.add(t)
+        db.session.add(p)
+        db.session.commit()
+        instance.lobby_id = l.id
+        g.player = o
+        instance.on_set_team_name(0, 'test')
+        l = db.session.merge(l)
+        self.assertEqual(l.teams[0].name, 'test')
+
+    @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')
+    @patch('lobbypy.namespaces.lobby.make_lobby_item_dict')
+    @patch('lobbypy.namespaces.lobby.make_lobby_dict')
+    def test_on_set_lobby_name(self, magic_make, magic_item_make, magic_broadcast):
+        instance = self._makeOne()
+        o = Player('')
+        l = Lobby('', o, '', '', '')
+        t = Team('Red')
+        l.teams.append(t)
+        p = Player('0')
+        t.append_player(p)
+        db.session.add(o)
+        db.session.add(l)
+        db.session.add(t)
+        db.session.add(p)
+        db.session.commit()
+        instance.lobby_id = l.id
+        g.player = o
+        instance.on_set_lobby_name('test')
+        l = db.session.merge(l)
+        self.assertEqual(l.name, 'test')

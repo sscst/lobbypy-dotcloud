@@ -1,9 +1,9 @@
 from flask import g, current_app
 from srcdspy.rcon import RconException
-from lobbypy.models import Lobby, make_lobby_item_dict, make_lobby_dict
+from lobbypy.models import Lobby, Player, make_lobby_item_dict, make_lobby_dict
 from lobbypy.utils import db
 from lobbypy.controllers import leave_or_delete_all_lobbies
-from lobbypy.lib.srcds_api import connect, check_map, check_players
+from lobbypy.lib.srcds_api import connect_rcon, connect_query, check_map, check_players
 from .base import BaseNamespace, RedisListenerMixin, RedisBroadcastMixin
 
 class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
@@ -77,50 +77,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
                     make_lobby_item_dict(lobby))
             self.broadcast_event('/lobby/%d', 'update', make_lobby_dict(lobby))
 
-    def on_create_lobby(self, name, server_info, game_map):
-        """Create and join lobby"""
-        assert g.player
-        assert not self.lobby_id
-        # Check server
-        if current_app.config.get('RCON_CHECK_SERVER', True):
-            try:
-                sr = connect_rcon(server_info)
-                sq = connect_query(server_info)
-            except RconException:
-                return False, 'bad_pass'
-            except Exception:
-                return False, 'server_issue'
-            else:
-                if not check_map(sr):
-                    return False, 'map_dne'
-                # TODO: ask if you want to kick players
-                if not check_players(sq):
-                    return False, 'players'
-                sr.close()
-                sq.close()
-        # Leave or delete old lobbies
-        lobby_deletes = leave_or_delete_all_lobbies(g.player)
-        # TODO: pull/generate password from list
-        lobby = Lobby(name, g.player, server_info, game_map, 'password')
-        lobby.join(g.player)
-        db.session.add(lobby)
-        db.session.commit()
-        # Send event to redis
-        self.broadcast_event('/lobby/', 'create', make_lobby_item_dict(lobby))
-        # Send leave or deletes
-        [self.broadcast_leave_or_delete(*l_d) for l_d in lobby_deletes]
-        # Update ACL
-        self.add_acl_method('on_set_team')
-        self.add_acl_method('on_leave')
-        self.del_acl_method('on_create_lobby')
-        self.del_acl_method('on_join')
-        # Set lobby id and start listening on redis
-        self.lobby_id = lobby.id
-        self.listener_job = self.spawn(self.listener, '/lobby/%d' % lobby.id)
-        current_app.logger.info('Player %d created Lobby %d' % (g.player.id,
-            lobby.id))
-        return True, lobby.id
-
+    # ANON ALLOWED METHODS
     def on_join(self, lobby_id):
         """Join lobby"""
         lobby = Lobby.query.get(lobby_id)
@@ -140,6 +97,10 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
             self.add_acl_method('on_set_team')
             self.del_acl_method('on_create_lobby')
             self.del_acl_method('on_join')
+            if lobby.owner == g.player:
+                self.add_acl_method('on_kick')
+                self.add_acl_method('on_set_lobby_name')
+                self.add_acl_method('on_set_team_name')
         self.add_acl_method('on_leave')
         # Set lobby id and start listening on redis
         self.lobby_id = lobby_id
@@ -184,6 +145,54 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
             g.player else 'Anonymous', self.lobby_id))
         self.lobby_id = None
         return True
+
+    # PLAYER ONLY METHODS
+    def on_create_lobby(self, name, server_info, game_map):
+        """Create and join lobby"""
+        assert g.player
+        assert not self.lobby_id
+        # Check server
+        if current_app.config.get('RCON_CHECK_SERVER', True):
+            try:
+                sr = connect_rcon(server_info)
+                sq = connect_query(server_info)
+            except RconException:
+                return False, 'bad_pass'
+            except Exception:
+                return False, 'server_issue'
+            else:
+                if not check_map(sr):
+                    return False, 'map_dne'
+                # TODO: ask if you want to kick players
+                if not check_players(sq):
+                    return False, 'players'
+                sr.close()
+                sq.close()
+        # Leave or delete old lobbies
+        lobby_deletes = leave_or_delete_all_lobbies(g.player)
+        # TODO: pull/generate password from list
+        lobby = Lobby(name, g.player, server_info, game_map, 'password')
+        lobby.join(g.player)
+        db.session.add(lobby)
+        db.session.commit()
+        # Send event to redis
+        self.broadcast_event('/lobby/', 'create', make_lobby_item_dict(lobby))
+        # Send leave or deletes
+        [self.broadcast_leave_or_delete(*l_d) for l_d in lobby_deletes]
+        # Update ACL
+        self.add_acl_method('on_set_team')
+        self.add_acl_method('on_leave')
+        self.del_acl_method('on_create_lobby')
+        self.del_acl_method('on_join')
+        self.add_acl_method('on_kick')
+        self.add_acl_method('on_set_lobby_name')
+        self.add_acl_method('on_set_team_name')
+        # Set lobby id and start listening on redis
+        self.lobby_id = lobby.id
+        self.listener_job = self.spawn(self.listener, '/lobby/%d' % lobby.id)
+        current_app.logger.info('Player %d created Lobby %d' % (g.player.id,
+            lobby.id))
+        return True, lobby.id
 
     def on_set_team(self, team_id):
         """Set team in lobby"""
@@ -240,5 +249,63 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
             lobby.is_ready_player(g.player)))
         return True
 
+    # OWNER ONLY METHODS
     def on_start(self):
+        pass
+
+    def on_kick(self, player_id):
+        """Kick a player from the lobby"""
+        assert g.player
+        assert self.lobby_id
+        lobby = Lobby.query.get(self.lobby_id)
+        assert lobby.owner == g.player
+        player = Player.query.get(player_id)
+        if player is None:
+            return False, 'player_dne'
+        if not lobby.has_player(player):
+            return False, 'player_dne_lobby'
+        lobby.leave(player)
+        db.session.commit()
+        self.broadcast_event('/lobby/', 'update',
+                make_lobby_item_dict(lobby))
+        self.broadcast_event('/lobby/%d', 'update',
+                make_lobby_dict(lobby))
+        return True
+
+    def on_ban(self, player_id):
+        pass
+
+    def on_set_team_name(self, team_id, name):
+        assert g.player
+        assert self.lobby_id
+        lobby = Lobby.query.get(self.lobby_id)
+        assert lobby.owner == g.player
+        if team_id is None:
+            return False, 'team_is_spectator'
+        if not team_id < len(lobby.teams):
+            return False, 'team_dne'
+        if name is None or len(name) == 0:
+            return False, 'name_none'
+        team = lobby.teams[team_id]
+        team.name = name
+        db.session.commit()
+        self.broadcast_event('/lobby/%d', 'update',
+                make_lobby_dict(lobby))
+        return True
+
+    def on_set_lobby_name(self, name):
+        assert g.player
+        assert self.lobby_id
+        lobby = Lobby.query.get(self.lobby_id)
+        assert lobby.owner == g.player
+        if name is None or len(name) == 0:
+            return False, 'name_none'
+        lobby.name = name
+        db.session.commit()
+        self.broadcast_event('/lobby/', 'update',
+                make_lobby_item_dict(lobby))
+        self.broadcast_event('/lobby/%d', 'update',
+                make_lobby_dict(lobby))
+
+    def on_give_owner(self):
         pass
