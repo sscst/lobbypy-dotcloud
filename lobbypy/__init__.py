@@ -1,7 +1,7 @@
 import os
 from socketio.server import SocketIOServer
 from flask import Flask
-from lobbypy.utils import db, mako, oid
+from lobbypy.utils import db, mako, oid, cache
 
 def create_app():
     return Flask(__name__)
@@ -15,9 +15,16 @@ def config_app(app, **config):
     app.debug = config.get('DEBUG', False)
     app.config['TESTING'] = config.get('TESTING', False)
     app.config['RCON_CHECK_SERVER'] = config.get('RCON_CHECK_SERVER', True)
+    app.config['CACHE_TYPE'] = config.get('CACHE_TYPE', 'null')
+    if app.config['CACHE_TYPE'] == 'redis':
+        app.config['CACHE_REDIS_HOST'] = config['CACHE_REDIS_HOST']
+        app.config['CACHE_REDIS_PORT'] = config.get('CACHE_REDIS_PORT', None)
+        app.config['CACHE_REDIS_PASSWORD'] = config.get('CACHE_REDIS_PASSWORD',
+                None)
 
     mako.init_app(app)
     db.init_app(app)
+    cache.init_app(app)
     oid.init_app(app)
     from lobbypy import models
     from lobbypy import views
