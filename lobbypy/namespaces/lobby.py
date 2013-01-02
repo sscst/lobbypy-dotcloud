@@ -18,6 +18,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         # Add create if we're authenticated
         if g.player:
             self.add_acl_method('on_create_lobby')
+        current_app.logger.info('Player: %s connected to LobbyNamespace' %
+                g.player.id if g.player else 'Anonymous')
 
     def disconnect(self, *args, **kwargs):
         """Disconnect handling"""
@@ -37,6 +39,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
                         make_lobby_item_dict(lobby))
                 self.broadcast_event('/lobby/%d', 'update',
                         make_lobby_dict(lobby))
+        current_app.logger.info('Player: %s disconnected from LobbyNamespace' %
+                g.player.id if g.player else 'Anonymous')
         # Do real disconnect logic
         super(LobbyNamespace, self).disconnect(*args, **kwargs)
 
@@ -50,12 +54,18 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         # elsewhere
         if not g.player or g.player.id in p_ids:
             self.emit('update', lobby_info)
+            current_app.logger.debug('Emitting update with %s to Player: %s on Socket: %s',
+                    (lobby_info, g.player.id if g.player else 'Anonymous', 'None'))
         else:
             self.emit('leave')
+            current_app.logger.debug('Emitting leave to Player: %d on Socket: %s',
+                    (g.player.id, 'None'))
 
     def on_redis_delete(self):
         """Send delete to user"""
         self.emit('delete')
+        current_app.logger.debug('Emitting delete to Player: %s on Socket: %s',
+                (g.player.id if g.player else 'Anonymous', 'None'))
 
     def broadcast_leave_or_delete(self, lobby, is_delete):
         """Broadcast leave or delete to redis"""
@@ -104,6 +114,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         # Set lobby id and start listening on redis
         self.lobby_id = lobby.id
         self.listener_job = self.spawn(self.listener, '/lobby/%d' % lobby.id)
+        current_app.logger.info('Player %d created Lobby %d' % (g.player.id,
+            lobby.id))
         return True, lobby.id
 
     def on_join(self, lobby_id):
@@ -129,6 +141,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         # Set lobby id and start listening on redis
         self.lobby_id = lobby_id
         self.listener_job = self.spawn(self.listener, '/lobby/%d' % lobby_id)
+        current_app.logger.info('Player %s joined Lobby %d', (g.player.id if
+            g.player else 'Anonymous', lobby_id))
         return True
 
     def on_leave(self):
@@ -163,6 +177,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
             self.add_acl_method('on_create_lobby')
         # Kill job and lobby_id
         self.listener_job.kill()
+        current_app.logger.info('Player %s left Lobby %d', (g.player.id if
+            g.player else 'Anonymous', self.lobby_id))
         self.lobby_id = None
         return True
 
@@ -183,6 +199,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         else:
             self.del_acl_method('on_set_class')
             self.del_acl_method('on_toggle_ready')
+        current_app.logger.info('Player %d set team to %s', (g.player.id,
+            team_id if team_id else 'Spectator'))
         return True
 
     def on_set_class(self, class_id):
@@ -195,6 +213,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         # Broadcast redis update
         self.broadcast_event('/lobby/', 'update', make_lobby_item_dict(lobby))
         self.broadcast_event('/lobby/%d', 'update', make_lobby_dict(lobby))
+        current_app.logger.info('Player %d set class to %s', (g.player.id,
+            class_id if class_id else 'Random'))
         return True
 
     def on_toggle_ready(self):
@@ -213,6 +233,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         else:
             self.del_acl_method('on_set_class')
             self.del_acl_method('on_set_team')
+        current_app.logger.info('Player %d toggled ready to %s', (g.player.id,
+            lobby.is_ready_player(g.player)))
         return True
 
     def on_start(self):
