@@ -6,6 +6,10 @@ class Player(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     steam_id = db.Column(db.String(40), unique=True)
     lobby = db.relationship('Lobby', uselist=False, backref='owner')
+    # only used for admins/mods
+    password = db.Column(db.String(48), nullable=True)
+    admin = db.Column(db.Boolean, default=False, nullable=False)
+    auth_attempts = db.Column(db.Integer, default=0, nullable=False)
 
     def __init__(self, steam_id):
         self.steam_id = steam_id
@@ -18,14 +22,9 @@ class Player(db.Model):
             db.session.add(rv)
         return rv
 
-    def __getattr__(self, name):
-        if name == 'name':
-            return self._get_persona_name()
-        raise AttributeError(name)
-
-    def _get_persona_name(self):
-        return self._get_player_summary()['personaname']
-
-    # TODO: cache
     def _get_player_summary(self):
         return get_player_summary_for_steam_id(self.steam_id)
+
+    @property
+    def name(self):
+        return self._get_player_summary()['personaname']

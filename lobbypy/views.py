@@ -1,4 +1,5 @@
 import re
+from pbkdf2 import crypt
 from flask import (
         session,
         request,
@@ -6,7 +7,9 @@ from flask import (
         flash,
         redirect,
         g,
-        current_app
+        abort,
+        current_app,
+        url_for
         )
 from flask.ext.mako import render_template
 from lobbypy.utils import oid, db
@@ -17,7 +20,7 @@ from socketio import socketio_manage
 _steam_id_re = re.compile('steamcommunity.com/openid/id/(.*?)$')
 
 def index():
-    hellouser = 'Hello %s!' % session.get('user_id', 'Anonymous')
+    hellouser = 'Hello %s!' % (g.player.name if g.player else 'Anonymous')
     return render_template('index.mako', **{
         'section': 'home',
         'hellouser': hellouser
@@ -41,13 +44,46 @@ def create_or_login(resp):
 
 def before_request():
     g.player = None
+    g.admin_authed = False
     if 'user_id' in session:
         g.player = Player.query.get(session['user_id'])
+    if 'auth_time' in session:
+        # check timeout
+        if (datetime.now() - session['auth_time'] >
+                current_app.config['ADMIN_AUTH_TIMEOUT']):
+            del session['auth_time']
+        else:
+            g.admin_authed = True
 
 def logout():
     session.pop('user_id', None)
+    session.pop('auth_time', None)
     current_app.logger.info('Player %d logged out' % g.player.id)
     return redirect(oid.get_next_url())
+
+def admin():
+    if not g.player or not g.player.admin or not g.player.password:
+        current_app.logger.info('Player: %s tried to access admin url, but'
+        ' is not an admin' % (g.player.id if g.player else 'Anonymous'))
+        abort(404)
+    if request.method == 'POST':
+        hashed_pw = crypt(request.form['password'], g.player.password)
+        if hashed_pw != g.player.password:
+            g.player.auth_attempts += 1
+            db.session.commit()
+            if (g.player.auth_attempts >
+                    current_app.config['MAX_AUTH_ATTEMPTS']):
+                return render_template('admin_locked.mako')
+            return revnder_template('admin_login.mako', **{
+                'bad_pass': True
+            })
+        session['auth_time'] = datetime.now()
+        redirect(url_for('admin'))
+    if not g.admin_authed:
+        # this admin has yet to log in
+        return render_template('admin_login.mako')
+    # we're golden like jarate
+    return render_template('admin.mako')
 
 def run_socketio(path):
     from lobbypy.namespaces import LobbiesNamespace, LobbyNamespace
