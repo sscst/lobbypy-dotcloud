@@ -1,16 +1,14 @@
 from srcdspy import SourceRcon
 from srcdspy.rcon import RconException
 
-def connect_rcon(server_info):
-    rcon_pass, server_info = rcon_info.split('@')
-    rcon_server_ip, rcon_server_port = server_info.split(':')
+def connect_rcon(server_address, rcon_password):
+    rcon_server_ip, rcon_server_port = server_address.split(':')
     sr = SourceRcon()
-    sr.connect((rcon_server_ip, rcon_server_port), rcon_pass)
+    sr.connect((rcon_server_ip, rcon_server_port), rcon_password)
     return sr
 
-def connect_query(server_info):
-    rcon_pass, server_info = rcon_info.split('@')
-    rcon_server_ip, rcon_server_port = server_info.split(':')
+def connect_query(server_address):
+    rcon_server_ip, rcon_server_port = server_address.split(':')
     sq = SourceRcon()
     sq.connect((rcon_server_ip, rcon_server_port))
     return sq

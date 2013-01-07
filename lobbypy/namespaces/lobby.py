@@ -147,15 +147,15 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         return True
 
     # PLAYER ONLY METHODS
-    def on_create_lobby(self, name, server_info, game_map):
+    def on_create_lobby(self, name, server_address, rcon_password, game_map):
         """Create and join lobby"""
         assert g.player
         assert not self.lobby_id
         # Check server
         if current_app.config.get('RCON_CHECK_SERVER', True):
             try:
-                sr = connect_rcon(server_info)
-                sq = connect_query(server_info)
+                sr = connect_rcon(server_address, rcon_password)
+                sq = connect_query(server_address)
             except RconException:
                 return False, 'bad_pass'
             except Exception:
@@ -171,7 +171,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         # Leave or delete old lobbies
         lobby_deletes = leave_or_delete_all_lobbies(g.player)
         # TODO: pull/generate password from list
-        lobby = Lobby(name, g.player, server_info, game_map, 'password')
+        lobby = Lobby(name, g.player, server_address, rcon_password, game_map, 'password')
         lobby.join(g.player)
         db.session.add(lobby)
         db.session.commit()
