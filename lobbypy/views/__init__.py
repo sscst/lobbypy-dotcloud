@@ -86,7 +86,7 @@ def admin():
             if (g.player.auth_attempts >
                     current_app.config['MAX_AUTH_ATTEMPTS']):
                 return render_template('admin_locked.mako')
-            return revnder_template('admin_login.mako', **{
+            return render_template('admin_login.mako', **{
                 'bad_pass': True
             })
         session['auth_time'] = datetime.now()
