@@ -15,30 +15,23 @@ from flask.ext.mako import render_template
 from lobbypy.utils import oid, db
 from lobbypy.models import Player
 from .utils import admin_check
-from .rest_admin import (
-        create_player,
-        update_player,
-        delete_player,
-        create_lobby,
-        update_lobby,
-        delete_lobby,
-        append_team,
-        update_team,
-        delete_team,
-        append_spectator,
-        remove_spectator,
-        append_lobby_player,
-        update_lobby_player,
-        delete_lobby_player
+from .rest import (
+        PlayerAPI,
+        PlayerListingAPI,
+        LobbyAPI,
+        LobbyListingAPI,
+        SpectatorAPI,
+        SpectatorListingAPI,
+        TeamAPI,
+        TeamListingAPI,
+        LobbyPlayerAPI,
+        LobbyPlayerListingAPI,
 )
 
-__all__ = ['index', 'login', 'logout', 'admin', 'create_player',
-    'update_player', 'delete_player', 'create_lobby',
-        'update_lobby', 'delete_lobby', 'append_team',
-        'update_team', 'delete_team', 'append_spectator',
-        'remove_spectator', 'append_lobby_player',
-        'update_lobby_player', 'delete_lobby_player',
-        'before_request']
+__all__ = ['index', 'login', 'logout', 'admin', 'PlayerAPI', 'LobbyAPI',
+        'SpectatorAPI', 'TeamAPI', 'LobbyPlayerAPI', 'before_request',
+        'LobbyListingAPI', 'PlayerListingAPI', 'SpectatorListingAPI',
+        'TeamListingAPI', 'LobbyPlayerListingAPI']
 _steam_id_re = re.compile('steamcommunity.com/openid/id/(.*?)$')
 
 def index():

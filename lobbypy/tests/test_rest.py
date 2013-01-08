@@ -5,7 +5,7 @@ from lobbypy import create_app, config_app
 from lobbypy.utils import db
 from lobbypy.models import Player, Lobby, Team
 
-class LobbyNamespaceTest(TestCase):
+class RestTest(TestCase):
     def create_app(self):
         app = create_app()
         config_app(app, SQLALCHEMY_DATABASE_URI='sqlite://', TESTING=True)

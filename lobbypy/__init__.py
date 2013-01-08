@@ -41,37 +41,27 @@ def config_app(app, **config):
 
     # ADMIN REST
     app.add_url_rule('/admin/rest/players',
-            view_func=views.create_player, methods=['POST'])
+        view_func=views.PlayerListingAPI.as_view('player_listing'))
     app.add_url_rule('/admin/rest/players/<int:player_id>',
-            view_func=views.update_player, methods=['PUT'])
-    app.add_url_rule('/admin/rest/players/<int:player_id>',
-            view_func=views.delete_player, methods=['DELETE'])
+        view_func=views.PlayerAPI.as_view('player'))
     app.add_url_rule('/admin/rest/lobbies',
-            view_func=views.create_lobby, methods=['POST'])
+        view_func=views.LobbyListingAPI.as_view('lobby_listing'))
     app.add_url_rule('/admin/rest/lobbies/<int:lobby_id>',
-            view_func=views.update_lobby, methods=['PUT'])
-    app.add_url_rule('/admin/rest/lobbies/<int:lobby_id>',
-            view_func=views.delete_lobby, methods=['DELETE'])
+        view_func=views.LobbyAPI.as_view('lobby'))
     app.add_url_rule('/admin/rest/lobbies/<int:lobby_id>/teams',
-            view_func=views.append_team, methods=['POST'])
+        view_func=views.TeamListingAPI.as_view('team_listing'))
     app.add_url_rule(('/admin/rest/lobbies/<int:lobby_id>'
         '/teams/<int:team_id>'),
-        view_func=views.update_team, methods=['PUT'])
+        view_func=views.TeamAPI.as_view('team'))
     app.add_url_rule(('/admin/rest/lobbies/<int:lobby_id>'
-        '/teams/<int:team_id>'),
-        view_func=views.delete_team, methods=['DELETE'])
+        '/spectators'),
+        view_func=views.SpectatorListingAPI.as_view('spectator_listing'))
     app.add_url_rule(('/admin/rest/lobbies/<int:lobby_id>'
-        '/spectators'), view_func=views.append_spectator,
-        methods=['POST'])
-    app.add_url_rule(('/admin/rest/lobbies/<int:lobby_id>'
-        '/spectators/<int:player_id>'), view_func=views.remove_spectator,
-        methods=['DELETE'])
+        '/spectators/<int:player_id>'),
+        view_func=views.SpectatorAPI.as_view('spectator'))
     app.add_url_rule(('/admin/rest/lobbies/<int:lobby_id>'
         '/teams/<int:team_id>/players'),
-        view_func=views.append_lobby_player, methods=['POST'])
+        view_func=views.LobbyPlayerListingAPI.as_view('lobby_player_listing'))
     app.add_url_rule(('/admin/rest/lobbies/<int:lobby_id>'
         '/teams/<int:team_id>/players/<int:player_id>'),
-        view_func=views.update_lobby_player, methods=['PUT'])
-    app.add_url_rule(('/admin/rest/lobbies/<int:lobby_id>'
-        '/teams/<int:team_id>/players/<int:player_id>'),
-        view_func=views.delete_lobby_player, methods=['DELETE'])
+        view_func=views.LobbyPlayerAPI.as_view('lobby_player'))
