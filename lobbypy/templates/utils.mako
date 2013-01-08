@@ -9,18 +9,18 @@
 <%def name="css_link(x)" filter="trim">
     <link rel="stylesheet"
           type="text/css"
-          href="${static_link("/".join(("styles", x)))}" />
+          href="${static_link(x)}" />
 </%def>
 
 <%def name="js_link(x)" filter="trim">
-    <script type="text/javascript" src="${static_link("/".join(("js", x)))}">
+    <script type="text/javascript" src="${static_link(x)}">
     </script>
 </%def>
 
 <%def name="jquery_link()" filter="trim">
     <script
      type="text/javascript"
-     src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js">
+     src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js">
     </script>
 </%def>
 

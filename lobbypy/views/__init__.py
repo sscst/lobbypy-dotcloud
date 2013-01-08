@@ -53,6 +53,7 @@ def create_or_login(resp):
     g.player = Player.get_or_create(match.group(1))
     db.session.commit()
     session['user_id'] = g.player.id
+    session['username'] = g.player.name
     flash('You are logged in as %s' % g.player.steam_id)
     current_app.logger.info('Player %d logged in' % g.player.id)
     return redirect(oid.get_next_url())
@@ -72,6 +73,7 @@ def before_request():
 
 def logout():
     session.pop('user_id', None)
+    session.pop('username', None)
     session.pop('auth_time', None)
     current_app.logger.info('Player %d logged out' % g.player.id)
     return redirect(oid.get_next_url())
@@ -86,7 +88,7 @@ def admin():
             if (g.player.auth_attempts >
                     current_app.config['MAX_AUTH_ATTEMPTS']):
                 return render_template('admin_locked.mako')
-            return revnder_template('admin_login.mako', **{
+            return render_template('admin_login.mako', **{
                 'bad_pass': True
             })
         session['auth_time'] = datetime.now()
