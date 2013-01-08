@@ -7,26 +7,21 @@
 </%def>
 
 <%def name="css_link(x)" filter="trim">
-    <link rel="stylesheet"
-          type="text/css"
-          href="${static_link(x)}" />
+    <link rel="stylesheet" type="text/css" href="${static_link(x)}" />
 </%def>
 
 <%def name="js_link(x)" filter="trim">
-    <script type="text/javascript" src="${static_link(x)}">
-    </script>
+    <script type="text/javascript" src="${static_link(x)}"></script>
 </%def>
 
 <%def name="jquery_link()" filter="trim">
-    <script
-     type="text/javascript"
-     src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js">
-    </script>
+    ${js_link(https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js)}
 </%def>
 
 <%def name="socketio_link()" filter="trim">
-    <script
-     type="text/javascript"
-     src="/static/socket.io.min.js">
-    </script>
+    ${js_link(/static/socket.io.min.js)}
+</%def>
+
+<%def name="handlebars_link()" filter="trim">
+    ${js_link(/static/handlebars.js)}
 </%def>
