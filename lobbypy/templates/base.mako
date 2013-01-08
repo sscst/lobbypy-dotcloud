@@ -5,7 +5,6 @@
   <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
   ${utils.socketio_link()}
   ${utils.jquery_link()}
-  ${utils.handlebars_link()}
   ${utils.js_link("bootstrap.min.js")}
   ${utils.css_link("bootstrap.min.css")}
   ${utils.css_link("default.css")}
