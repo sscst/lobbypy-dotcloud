@@ -2,12 +2,20 @@ from flask import request, abort
 from flask.views import MethodView
 
 from lobbypy.models import Player, Lobby, Team, LobbyPlayer
+from lobbypy.models.utils import (
+        make_player_dict,
+        make_lobby_dict,
+        make_team_dict,
+        make_lobby_player_dict
+        )
 from lobbypy.utils import db
 from .utils import admin_check, jsonify
 
 class PlayerListingAPI(MethodView):
     def get(self):
-        pass
+        players = Player.query.all()
+        player_dicts = [make_player_dict(p) for p in players]
+        return jsonify(200, players = player_dicts)
 
     @admin_check
     def post(self):
@@ -18,7 +26,8 @@ class PlayerListingAPI(MethodView):
 
 class PlayerAPI(MethodView):
     def get(self, player_id):
-        pass
+        player = Player.query.get_or_404(player_id)
+        return jsonify(200, player = make_player_dict(player))
 
     @admin_check
     def put(self, player_id):
@@ -41,7 +50,9 @@ class PlayerAPI(MethodView):
 
 class LobbyListingAPI(MethodView):
     def get(self):
-        pass
+        lobbies = Lobby.query.all()
+        lobby_dicts = [make_lobby_dict(l) for l in lobbies]
+        return jsonify(200, lobbies = lobby_dicts)
 
     @admin_check
     def post(self):
@@ -61,7 +72,8 @@ class LobbyListingAPI(MethodView):
 
 class LobbyAPI(MethodView):
     def get(self, lobby_id):
-        pass
+        lobby = Lobby.query.get_or_404(lobby_id)
+        return jsonify(200, lobby = make_lobby_dict(lobby))
 
     @admin_check
     def put(self, lobby_id):
@@ -95,7 +107,9 @@ class LobbyAPI(MethodView):
 
 class SpectatorListingAPI(MethodView):
     def get(self, lobby_id):
-        pass
+        lobby = Lobby.query.get_or_404(lobby_id)
+        player_dicts = [make_player_dict(p) for p in lobby.spectators]
+        return jsonify(200, spectators = player_dicts)
 
     @admin_check
     def post(self, lobby_id):
@@ -114,7 +128,11 @@ class SpectatorListingAPI(MethodView):
 
 class SpectatorAPI(MethodView):
     def get(self, lobby_id, player_id):
-        pass
+        lobby = Lobby.query.get_or_404(lobby_id)
+        player = Player.query.get_or_404(player_id)
+        if player not in lobby.spectators:
+            abort(404)
+        return jsonify(200, spectator = make_player_dict(player))
 
     @admin_check
     def delete(self, lobby_id, player_id):
@@ -130,7 +148,9 @@ class SpectatorAPI(MethodView):
 
 class TeamListingAPI(MethodView):
     def get(self, lobby_id):
-        pass
+        lobby = Lobby.query.get_or_404(lobby_id)
+        team_dicts = [make_team_dict(i, t) for i, t in enumerate(lobby.teams)]
+        return jsonify(200, teams = team_dicts)
 
     @admin_check
     def post(self, lobby_id):
@@ -146,7 +166,10 @@ class TeamListingAPI(MethodView):
 
 class TeamAPI(MethodView):
     def get(self, lobby_id, team_id):
-        pass
+        lobby = Lobby.query.get_or_404(lobby_id)
+        if team_id >= len(lobby.teams) or team_id < 0:
+            abort(404)
+        return jsonify(200, team = make_team_dict(team_id, lobby.teams[team_id]))
 
     @admin_check
     def put(self, lobby_id, team_id):
@@ -179,7 +202,12 @@ class TeamAPI(MethodView):
 
 class LobbyPlayerListingAPI(MethodView):
     def get(self, lobby_id, team_id):
-        pass
+        lobby = Lobby.query.get_or_404(lobby_id)
+        if team_id >= len(lobby.teams) or team_id < 0:
+            abort(404)
+        players_dict = [make_lobby_player_dict(lp) for lp in
+                lobby.teams[team_id].players]
+        return jsonify(200, lobby_players = players_dict)
 
     @admin_check
     def post(self, lobby_id, team_id):
@@ -203,7 +231,15 @@ class LobbyPlayerListingAPI(MethodView):
 
 class LobbyPlayerAPI(MethodView):
     def get(self, lobby_id, team_id, player_id):
-        pass
+        lobby = Lobby.query.get_or_404(lobby_id)
+        if team_id >= len(lobby.teams) or team_id < 0:
+            abort(404)
+        team = lobby.teams[team_id]
+        player = Player.query.get_or_404(player_id)
+        if not team.has_player(player):
+            abort(404)
+        return jsonify(200,
+                lobby_player = make_lobby_player_dict(team.get_lobby_player(player)))
 
     @admin_check
     def put(self, lobby_id, team_id, player_id):
