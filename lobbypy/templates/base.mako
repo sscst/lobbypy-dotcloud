@@ -6,6 +6,7 @@
   ${utils.socketio_link()}
   ${utils.jquery_link()}
   ${utils.js_link("bootstrap.min.js")}
+  ${utils.js_link("handlebars.js")}
   ${utils.css_link("bootstrap.min.css")}
   ${utils.css_link("default.css")}
   ## ${next.css() | trim}
