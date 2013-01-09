@@ -1,5 +1,5 @@
 body {
-	padding-top: 60px;
+	padding-top: 40px;
 }
 
 .icon-white {
@@ -12,32 +12,47 @@ body {
 
 /* lobby items */
 
-.lobbylist {
-	border: 1px black solid;
+ul#lobbylist {
+	list-style: none;
+	display: list-item;
+	margin: 0px 5px 0px 5px;
 }
 
-.lobbylist-scrollspy {
+.lobbylist-box {
 	height: 300px;
 	overflow: auto;
 	position: relative;
 	padding: 5px 5px 5px 5px;
+	border: 1px black solid;
 }
 
 .lobbyitem {
 	height: 100px;
+	display: block;
 	background: url('/static/images/litembg.png');
 	padding: 4px 4px 4px 4px;
 	border: 1px #575757 solid;
 	-webkit-border-radius: 6px;
-	-mox-border-radius: 6px;
+	-moz-border-radius: 6px;
 	border-radius: 6px;
 }
 
-.lobbyitem .name {
+.lobbyitem .title {
 	position: relative;
+	display: block;
 	float: left;
-	top: 6;
-	left: 6;
+	top: 6px;
+	left: 6px;
+	color: #ffffff;
+}
+
+.lobbyitem .players {
+	position: relative;
+	display: block;
+	text-align: right;
+	float: right;
+	bottom: -70px;
+	right: -52px;
 	color: #ffffff;
 }
 
@@ -46,6 +61,7 @@ body {
 	font-weight: bold;
 	float: right;
 	text-align: right;
+	display: block;
 	top: 6px;
 	right: 20px;
 	color: #ffffff;
@@ -57,19 +73,7 @@ body {
 	font-family: Helvetica;
 }
 
-.lobbydetails .lobby-name {
-	
-}
-
-.lobbydetails .map-name {
-	
-}
-
-.lobbydetails .map-img {
-	border: 2px black solid;
-}
-
-.lobbydetails .option {
+.lobbydetails .lobbyheader {
 	
 }
 
@@ -77,7 +81,36 @@ body {
 
 }
 
+.map-details {
+	text-align: left;
+}
 
+.map-details .map-name {
+	font-weight: bold;
+}
+
+.map-img {
+	border: 1px black solid;
+}
+
+
+/* lobby players table */
+
+.lobbytable {
+	
+}
+
+.lobbytable .redh {
+	text-align: center;
+	vertical-align: text-top;
+	background-color: #c15143;
+}
+
+.lobbytable .bluh {
+	text-align: center;
+	vertical-align: text-top;
+	background-color: #80a1c2;
+}
 
 /* bootstrap */
 
@@ -251,7 +284,7 @@ i {
 }
 
 .row-white {
-    color: #383838;
+	color: #383838;
 	padding: 8px 8px 8px 8px;
 	background-color: #fafafa;
 	-webkit-border-radius: 4px;
@@ -277,47 +310,6 @@ i {
 	width:910px;
 }
 
-.table-striped tbody tr:nth-child(odd) td,
-.table-striped tbody tr:nth-child(odd) th {
-    background-color: #efefef;
-}
-
-.table-fixed td {
-	white-space: nowrap;
-}
-
-.table-fixed tbody th {
-	font-weight: normal;
-}
-
-.table-fixed .tableFloatingHeader {
-	background-color: #ffffff;
-}
-
-.table-list td, 
-.table-list th {
-	vertical-align: top;
-}
-
-.table tbody tr:hover td,
-.table tbody tr:hover th {
-  background-color: #f5f5f5;
-}
-
-/* bootstrap mod to show menu on hover instead of click */
-.navbar .dropdown-menu .sub-menu {
-    position: absolute;
-    top: 0;
-    left: 100%;
-    margin-top: -1px;
-    visibility: hidden;
-}
-.navbar .dropdown-menu li:hover .sub-menu {
-    visibility: visible;
-}
-.navbar .dropdown:hover .dropdown-menu {
-    display: block;
-}
 /* reduce margin to improve dropdowns */
 .nav-tabs .dropdown-menu, .nav-pills .dropdown-menu, .navbar .dropdown-menu {
     margin-top: 0;
