@@ -1,4 +1,5 @@
 from json import dumps
+from mock import patch
 from flask import g, session
 from flask.ext.testing import TestCase
 from lobbypy import create_app, config_app
@@ -24,6 +25,143 @@ class RestTest(TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+
+    @patch('lobbypy.models.player.get_player_summary_for_steam_id')
+    def test_get_player_listing(self, magic_get_summary):
+        db.session.add(Player('0'))
+        db.session.commit()
+        magic_get_summary.return_value = {'personaname':'Anonymous'}
+        resp = self.client.get('/admin/rest/players')
+        self.assertStatus(resp, 200)
+        self.assertTrue('players' in resp.json)
+        players = resp.json['players']
+        self.assertEqual(len(players), 2)
+
+    @patch('lobbypy.models.player.get_player_summary_for_steam_id')
+    def test_get_player(self, magic_get_summary):
+        magic_get_summary.return_value = {'personaname':'Anonymous'}
+        resp = self.client.get('/admin/rest/players/%d' % self.admin.id)
+        self.assertStatus(resp, 200)
+        self.assertTrue('player' in resp.json)
+        player = resp.json['player']
+        self.assertTrue('id' in player)
+        self.assertTrue('steam_id' in player)
+        self.assertTrue('name' in player)
+
+    @patch('lobbypy.models.player.get_player_summary_for_steam_id')
+    def test_get_lobby_listing(self, magic_get_summary):
+        p = Player('0')
+        db.session.add(Lobby('A', self.admin, 'a', '', '', ''))
+        db.session.add(Lobby('B', p, 'b', '', '', ''))
+        db.session.commit()
+        magic_get_summary.return_value = {'personaname':'Anonymous'}
+        resp = self.client.get('/admin/rest/lobbies')
+        self.assertTrue('lobbies' in resp.json)
+        lobbies = resp.json['lobbies']
+        self.assertEqual(len(lobbies), 2)
+
+    @patch('lobbypy.models.player.get_player_summary_for_steam_id')
+    def test_get_lobby(self, magic_get_summary):
+        l = Lobby('A', self.admin, '', '', '', '')
+        db.session.add(l)
+        db.session.commit()
+        magic_get_summary.return_value = {'personaname':'Anonymous'}
+        resp = self.client.get('/admin/rest/lobbies/%d' % l.id)
+        self.assertTrue('lobby' in resp.json)
+        lobby = resp.json['lobby']
+        self.assertTrue('id' in lobby)
+        self.assertTrue('owner' in lobby)
+        self.assertTrue('game_map' in lobby)
+        self.assertTrue('teams' in lobby)
+        self.assertTrue('spectators' in lobby)
+
+    @patch('lobbypy.models.player.get_player_summary_for_steam_id')
+    def test_get_spectator_listing(self, magic_get_summary):
+        l = Lobby('A', self.admin, '', '', '', '')
+        p = Player('0')
+        l.spectators.append(self.admin)
+        l.spectators.append(p)
+        db.session.add(l)
+        db.session.commit()
+        magic_get_summary.return_value = {'personaname':'Anonymous'}
+        resp = self.client.get('/admin/rest/lobbies/%d/spectators' % l.id)
+        self.assertTrue('spectators' in resp.json)
+        specs = resp.json['spectators']
+        self.assertEqual(len(specs), 2)
+
+    @patch('lobbypy.models.player.get_player_summary_for_steam_id')
+    def test_get_spectator(self, magic_get_summary):
+        l = Lobby('A', self.admin, '', '', '', '')
+        l.spectators.append(self.admin)
+        db.session.add(l)
+        db.session.commit()
+        magic_get_summary.return_value = {'personaname':'Anonymous'}
+        resp = self.client.get('/admin/rest/lobbies/%d/spectators/%d' % (l.id,
+            self.admin.id))
+        self.assertTrue('spectator' in resp.json)
+        spec = resp.json['spectator']
+        self.assertTrue('id' in spec)
+        self.assertTrue('steam_id' in spec)
+        self.assertTrue('name' in spec)
+
+    @patch('lobbypy.models.player.get_player_summary_for_steam_id')
+    def test_get_team_listing(self, magic_get_summary):
+        l = Lobby('A', self.admin, '', '', '', '')
+        l.teams.append(Team('Red'))
+        l.teams.append(Team('Blu'))
+        db.session.add(l)
+        db.session.commit()
+        magic_get_summary.return_value = {'personaname':'Anonymous'}
+        resp = self.client.get('/admin/rest/lobbies/%d/teams' % l.id)
+        self.assertTrue('teams' in resp.json)
+        teams = resp.json['teams']
+        self.assertEqual(len(teams), 2)
+
+    @patch('lobbypy.models.player.get_player_summary_for_steam_id')
+    def test_get_team(self, magic_get_summary):
+        l = Lobby('A', self.admin, '', '', '', '')
+        l.teams.append(Team('Red'))
+        db.session.add(l)
+        db.session.commit()
+        magic_get_summary.return_value = {'personaname':'Anonymous'}
+        resp = self.client.get('/admin/rest/lobbies/%d/teams/0' % l.id)
+        self.assertTrue('team' in resp.json)
+        team = resp.json['team']
+        self.assertTrue('name' in team)
+        self.assertTrue('players' in team)
+
+    @patch('lobbypy.models.player.get_player_summary_for_steam_id')
+    def test_get_lobby_player_listing(self, magic_get_summary):
+        l = Lobby('A', self.admin, '', '', '', '')
+        t = Team('Red')
+        p = Player('0')
+        t.append_player(self.admin)
+        t.append_player(p)
+        l.teams.append(t)
+        db.session.add(l)
+        db.session.commit()
+        magic_get_summary.return_value = {'personaname':'Anonymous'}
+        resp = self.client.get('/admin/rest/lobbies/%d/teams/0/players' % l.id)
+        self.assertTrue('lobby_players' in resp.json)
+        l_players = resp.json['lobby_players']
+        self.assertEqual(len(l_players), 2)
+
+    @patch('lobbypy.models.player.get_player_summary_for_steam_id')
+    def test_get_lobby_player(self, magic_get_summary):
+        l = Lobby('A', self.admin, '', '', '', '')
+        t = Team('Red')
+        t.append_player(self.admin)
+        l.teams.append(t)
+        db.session.add(l)
+        db.session.commit()
+        magic_get_summary.return_value = {'personaname':'Anonymous'}
+        resp = self.client.get('/admin/rest/lobbies/%d/teams/0/players/%d' %
+                (l.id, self.admin.id))
+        self.assertTrue('lobby_player' in resp.json)
+        player = resp.json['lobby_player']
+        self.assertTrue('player' in player)
+        self.assertTrue('class_id' in player)
+        self.assertTrue('ready' in player)
 
     def test_create_player(self):
         resp = self.client.post('/admin/rest/players', data=dict(steam_id='0'))
