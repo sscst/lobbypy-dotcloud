@@ -35,7 +35,8 @@ __all__ = ['index', 'login', 'logout', 'admin', 'PlayerAPI', 'LobbyAPI',
 _steam_id_re = re.compile('steamcommunity.com/openid/id/(.*?)$')
 
 def index():
-    return render_template('index.mako')
+    playername = g.player.name if g.player else None
+    return render_template('index.mako', **{'username':playername})
 
 @oid.loginhandler
 def login():
@@ -49,7 +50,6 @@ def create_or_login(resp):
     g.player = Player.get_or_create(match.group(1))
     db.session.commit()
     session['user_id'] = g.player.id
-    session['username'] = g.player.name
     flash('You are logged in as %s' % g.player.steam_id)
     current_app.logger.info('Player %d logged in' % g.player.id)
     return redirect(oid.get_next_url())
@@ -69,7 +69,6 @@ def before_request():
 
 def logout():
     session.pop('user_id', None)
-    session.pop('username', None)
     session.pop('auth_time', None)
     current_app.logger.info('Player %d logged out' % g.player.id)
     return redirect(oid.get_next_url())
