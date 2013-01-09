@@ -35,11 +35,7 @@ __all__ = ['index', 'login', 'logout', 'admin', 'PlayerAPI', 'LobbyAPI',
 _steam_id_re = re.compile('steamcommunity.com/openid/id/(.*?)$')
 
 def index():
-    hellouser = 'Hello %s!' % (g.player.name if g.player else 'Anonymous')
-    return render_template('index.mako', **{
-        'section': 'home',
-        'hellouser': hellouser
-    })
+    return render_template('index.mako')
 
 @oid.loginhandler
 def login():
