@@ -10,6 +10,13 @@ body {
 	margin-top: 9px;
 }
 
+/* app container (for backbone)*/
+#app-container {
+	min-height: 740px;
+	padding: 0px 0px 0px 0px;
+	margin: 0px 0px 0px 0px;
+}
+
 /* lobby items */
 
 ul#lobbylist {
@@ -37,9 +44,14 @@ ul#lobbylist {
 	border-radius: 6px;
 }
 
-.lobbyitem .title {
+.lobbyitem .title,
+.lobbyitem .players,
+.lobbyitem .map {
 	position: relative;
 	display: block;
+}
+
+.lobbyitem .title {
 	float: left;
 	top: 6px;
 	left: 6px;
@@ -47,8 +59,6 @@ ul#lobbylist {
 }
 
 .lobbyitem .players {
-	position: relative;
-	display: block;
 	text-align: right;
 	float: right;
 	bottom: -70px;
@@ -57,11 +67,9 @@ ul#lobbylist {
 }
 
 .lobbyitem .map {
-	position: relative;
 	font-weight: bold;
 	float: right;
 	text-align: right;
-	display: block;
 	top: 6px;
 	right: 20px;
 	color: #ffffff;
@@ -70,7 +78,7 @@ ul#lobbylist {
 /* lobby details */
 
 .lobbydetails {
-	font-family: Helvetica;
+	/* font-family: Helvetica; */
 }
 
 .lobbydetails .lobbyheader {
