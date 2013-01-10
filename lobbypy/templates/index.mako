@@ -1,7 +1,7 @@
 <%inherit file="base.mako"/>
 <%namespace name="utils" file="utils.mako"/>
 
-<% def name="hb()" filter="trim">
+<%def name="hb()" filter="trim">
   <%include file="handlebars.mako"/>
 </%def>
 
