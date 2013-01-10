@@ -14,6 +14,7 @@ from flask import (
 from flask.ext.mako import render_template
 from lobbypy.utils import oid, db
 from lobbypy.models import Player
+from lobbypy.namespaces import LobbiesNamespace, LobbyNamespace
 from .utils import admin_check
 from .rest import (
         PlayerAPI,
@@ -94,11 +95,11 @@ def admin():
     return render_template('admin.mako')
 
 def run_socketio(path):
-    from lobbypy.namespaces import LobbiesNamespace, LobbyNamespace
     real_request = request._get_current_object()
-    socketio_manage(request.environ, {
+    real_app = current_app._get_current_object()
+    socketio_manage(real_request.environ, {
             '/lobbies': LobbiesNamespace,
             '/lobby': LobbyNamespace,
         },
-        request=real_request)
+        request=(real_app, real_request))
     return Response()
