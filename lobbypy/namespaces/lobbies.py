@@ -7,11 +7,14 @@ from .base import BaseNamespace, RedisListenerMixin
 class LobbiesNamespace(BaseNamespace, RedisListenerMixin):
     def on_subscribe(self):
         """Subscribe to lobby CUD listener"""
-        lobby_listing = [make_lobby_dict(l) for l in lobbies]
+        lobby_listing = [make_lobby_dict(l) for l in Lobby.query.all()]
         self.spawn(self.listener, '/lobby/')
         current_app.logger.info('Player: %s subscribed to LobbiesNamespace' %
                 g.player.id if g.player else 'Anonymous')
         return True, lobby_listing
+
+    def on_unsubscribe(self):
+        pass
 
     def on_get_lobby_listing(self):
         """Get full lobby listing"""
