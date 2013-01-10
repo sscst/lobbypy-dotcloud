@@ -1,4 +1,4 @@
-<script id="lobbies_view" type="text/x-handlebars-template">
+<script id="lobby_listing_template" type="text/x-handlebars-template">
   <div class="row">
     <div class="span12">
       <div class="lobbylist-box">

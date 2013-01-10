@@ -26,7 +26,7 @@ class LobbyNamespaceTest(TestCase):
         if environ is None:
             environ = {'socketio': MagicMock()}
         ctx = self.app.test_request_context('/socket.io/1')
-        ns = LobbyNamespace(environ, ns_name, request=ctx.request)
+        ns = LobbyNamespace(environ, ns_name, request=(ctx.app, ctx.request))
         self.ctxs.insert(0, ns.ctx)
         # need to call this as it's called by real virtsocket
         ns.initialize()

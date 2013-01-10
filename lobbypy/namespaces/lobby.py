@@ -107,7 +107,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         self.listener_job = self.spawn(self.listener, '/lobby/%d' % lobby_id)
         current_app.logger.info('Player %s joined Lobby %d', (g.player.id if
             g.player else 'Anonymous', lobby_id))
-        return True
+        return True, make_lobby_dict(lobby)
 
     def on_leave(self):
         """Leave lobby"""
