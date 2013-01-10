@@ -13,6 +13,7 @@
   ${next.js() | trim}
   ${utils.css_link("bootstrap.min.css")}
   ${utils.css_link("default.css")}
+  <%include file="handlebars.mako"/>
   ## ${next.css() | trim}
   <title>LobbyPy</title>
 </head>

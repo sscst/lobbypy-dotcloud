@@ -5,5 +5,5 @@
 </%def>
 
 <%def name="main_content()" filter="trim">
-
+<div id="app-container"></div>
 </%def>
