@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from pbkdf2 import crypt
 from socketio import socketio_manage
 from flask import (
@@ -78,11 +79,6 @@ def admin():
     if request.method == 'POST':
         hashed_pw = crypt(request.form['password'], g.player.password)
         if hashed_pw != g.player.password:
-            g.player.auth_attempts += 1
-            db.session.commit()
-            if (g.player.auth_attempts >
-                    current_app.config['MAX_AUTH_ATTEMPTS']):
-                return render_template('admin_locked.mako')
             return render_template('admin_login.mako', **{
                 'bad_pass': True
             })
