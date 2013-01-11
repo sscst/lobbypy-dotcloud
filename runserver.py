@@ -1,6 +1,7 @@
 from gevent import monkey; monkey.patch_all()
 import os, sys
-from flask.ext.script import Manager, prompt_bool
+from pbkdf2 import crypt
+from flask.ext.script import Manager, prompt_bool, prompt_pass
 from socketio.server import SocketIOServer
 
 from lobbypy import create_app, config_app
@@ -34,6 +35,27 @@ def drop_db():
     if prompt_bool(
             "Are you sure you want to clear the database"):
         db.drop_all()
+
+@manager.option('steam_id', action='store')
+def add_admin(steam_id):
+    config_app(app)
+    from lobbypy.utils import db
+    from lobbypy.models import Player
+    player = Player.query.filter_by(steam_id = steam_id).first()
+    if player:
+        player.admin = True
+    else:
+        player = Player(steam_id)
+        player.admin = True
+    password = prompt_pass(
+            "Enter password for the Administrator")
+    if password == prompt_pass(
+            "Re-enter password for the Administrator"):
+        player.password = crypt(password)
+        db.session.add(player)
+        db.session.commit()
+    else:
+        print "Passwords do not match, re-run command"
 
 if __name__ == '__main__':
     manager.run()
