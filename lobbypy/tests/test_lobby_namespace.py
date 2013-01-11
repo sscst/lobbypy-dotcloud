@@ -1,5 +1,5 @@
 from mock import MagicMock, patch
-from flask import g
+from flask import g, request, current_app
 from flask.ext.testing import TestCase
 from lobbypy import create_app, config_app
 from mock import patch, MagicMock
@@ -21,7 +21,8 @@ class LobbyNamespaceTest(TestCase):
         db.drop_all()
         [ctx.pop() for ctx in self.ctxs]
 
-    def _makeOne(self, environ=None, ns_name='lobby'):
+    @patch('lobbypy.namespaces.base.redis')
+    def _makeOne(self, magic_redis, environ=None, ns_name='lobby'):
         from lobbypy.namespaces.lobby import LobbyNamespace
         if environ is None:
             environ = {'socketio': MagicMock()}
@@ -91,7 +92,6 @@ class LobbyNamespaceTest(TestCase):
         self.assertEqual(l.spectators[0], p)
         self.assertEqual(instance.allowed_methods, set(['on_leave',
             'recv_connect', 'on_set_team']))
-        self.assertEqual(instance.listener_job, 'jerb')
         self.assertEqual(instance.lobby_id, l.id)
 
     @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')

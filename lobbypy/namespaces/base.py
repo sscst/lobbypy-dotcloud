@@ -28,13 +28,20 @@ class RedisBroadcastMixin(object):
                 (event, args, ns))
 
 class RedisListenerMixin(object):
-    def listener(self, ns):
+    def __init__(self, *args, **kwargs):
+        super(RedisListenerMixin, self).__init__(*args, **kwargs)
         r = redis.StrictRedis()
-        r = r.pubsub()
+        self.pubsub = r.pubsub()
+        print self.pubsub
 
-        r.subscribe(ns)
+    def subscribe(self, ns):
+        self.pubsub.subscribe(ns)
 
-        for m in r.listen():
+    def unsubscribe(self, ns):
+        self.pubsub.unsubscribe(ns)
+
+    def listener(self):
+        for m in self.pubsub.listen():
             if m['type'] == 'message':
                 data = loads(m['data'])
                 event = data.pop('event')

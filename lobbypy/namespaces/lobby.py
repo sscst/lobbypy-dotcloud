@@ -9,7 +9,7 @@ from .base import BaseNamespace, RedisListenerMixin, RedisBroadcastMixin
 class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
     def initialize(self):
         self.lobby_id = None
-        self.listener_job = None
+        self.spawn(self.listener)
 
     def get_initial_acl(self):
         return set(['on_join', 'recv_connect'])
@@ -104,7 +104,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         self.add_acl_method('on_leave')
         # Set lobby id and start listening on redis
         self.lobby_id = lobby_id
-        self.listener_job = self.spawn(self.listener, '/lobby/%d' % lobby_id)
+        self.subscribe('/lobby/%d' % lobby_id)
         current_app.logger.info('Player %s joined Lobby %d', (g.player.id if
             g.player else 'Anonymous', lobby_id))
         return True, make_lobby_dict(lobby)
@@ -121,8 +121,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
                 db.session.remove(lobby)
                 db.session.commit()
                 # Broadcast delete to lobby and lobby listing
-                self.broadcast_event('/lobby/', 'delete', lobby_id)
-                self.broadcast_event('/lobby/%d' % lobby_id, 'delete')
+                self.broadcast_event('/lobby/', 'delete', self.lobby_id)
+                self.broadcast_event('/lobby/%d' % self.lobby_id, 'delete')
             else:
                 lobby.leave(g.player)
                 db.session.commit()
@@ -139,8 +139,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
             self.del_acl_method('on_leave')
             self.add_acl_method('on_join')
             self.add_acl_method('on_create_lobby')
-        # Kill job and lobby_id
-        self.listener_job.kill()
+        self.unsubscribe('/lobby/%d' % self.lobby_id)
         current_app.logger.info('Player %s left Lobby %d', (g.player.id if
             g.player else 'Anonymous', self.lobby_id))
         self.lobby_id = None
