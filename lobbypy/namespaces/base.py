@@ -32,7 +32,6 @@ class RedisListenerMixin(object):
         super(RedisListenerMixin, self).__init__(*args, **kwargs)
         r = redis.StrictRedis()
         self.pubsub = r.pubsub()
-        print self.pubsub
 
     def subscribe(self, ns):
         self.pubsub.subscribe(ns)
