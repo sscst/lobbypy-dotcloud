@@ -20,7 +20,8 @@ class LobbiesNamespaceTest(TestCase):
         db.drop_all()
         [ctx.pop() for ctx in self.ctxs]
 
-    def _makeOne(self, environ=None, ns_name='lobbies'):
+    @patch('lobbypy.namespaces.base.redis')
+    def _makeOne(self, magic_redis, environ=None, ns_name='lobbies'):
         from lobbypy.namespaces.lobbies import LobbiesNamespace
         if environ is None:
             environ = {'socketio': MagicMock()}
@@ -51,7 +52,7 @@ class LobbiesNamespaceTest(TestCase):
         pubsub.listen.return_value = [
                 self._makeRedisMessage('update', lobby_json)]
         instance = self._makeOne()
-        instance.listener('/lobby/')
+        instance.listener()
         magic_method.assert_called_once_with('update', lobby_json)
 
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
@@ -64,7 +65,7 @@ class LobbiesNamespaceTest(TestCase):
         pubsub.listen.return_value = [
                 self._makeRedisMessage('create', lobby_json)]
         instance = self._makeOne()
-        instance.listener('/lobby/')
+        instance.listener()
         magic_method.assert_called_once_with('create', lobby_json)
 
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
@@ -76,7 +77,7 @@ class LobbiesNamespaceTest(TestCase):
         pubsub.listen.return_value = [
                 self._makeRedisMessage('delete', 1)]
         instance = self._makeOne()
-        instance.listener('/lobby/')
+        instance.listener()
         magic_method.assert_called_once_with('delete', 1)
 
     @patch('lobbypy.namespaces.lobbies.Lobby')
