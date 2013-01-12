@@ -22,7 +22,7 @@ def config_app(app, **config):
         app.config['CACHE_REDIS_PASSWORD'] = config.get('CACHE_REDIS_PASSWORD',
                 None)
     ADMIN_URL = config.get('ADMIN_URL', '/admin')
-    app.config['MAX_AUTH_ATTEMPTS'] = config.get('MAX_AUTH_ATTEMPTS', 5)
+    app.config['ADMIN_AUTH_TIMEOUT'] = config.get('ADMIN_AUTH_TIMEOUT', 5)
 
     mako.init_app(app)
     db.init_app(app)
