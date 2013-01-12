@@ -19,6 +19,22 @@ class BaseNamespace(Namespace):
         self.ctx.pop()
         super(BaseNamespace, self).disconnect(*args, **kwargs)
 
+class GeventSpawnMixin(object):
+    def __init__(self, *args, **kwargs):
+        self.spwaned_ctxs = []
+
+    def spawn(self, *args, **kwargs):
+        ctx = self.ctx.app.request_context(self.ctx.request.environ)
+        ctx.push()
+        self.spawned_ctxs.append(ctx)
+        super(GeventSpawnMixin, self).spawn(*args, **kwargs)
+
+    def kill_local_jobs(self, *args, **kwargs):
+        super(GeventSpawnMixin, self).kill_local_jobs(*args, **kwargs)
+        for ctx in self.spawned_ctxs:
+            ctx.pop()
+
+
 class RedisBroadcastMixin(object):
     def broadcast_event(self, ns, event, *args):
         r = redis.Redis()
@@ -45,8 +61,6 @@ class RedisListenerMixin(object):
         self.pubsub.unsubscribe(ns)
 
     def listener(self):
-        ctx = self.ctx.app.request_context(self.ctx.request.environ)
-        ctx.push()
         for m in self.pubsub.listen():
             if m['type'] == 'message':
                 data = loads(m['data'])
@@ -56,5 +70,3 @@ class RedisListenerMixin(object):
                 args = data.pop('args', [])
                 args.insert(0, channel)
                 self.call_method(method_name, None, *args)
-        ctx.pop()
-
