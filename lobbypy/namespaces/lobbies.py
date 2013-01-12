@@ -5,9 +5,6 @@ from lobbypy.models import Lobby, Player, make_lobby_item_dict
 from .base import BaseNamespace, RedisListenerMixin
 
 class LobbiesNamespace(BaseNamespace, RedisListenerMixin):
-    def initialize(self):
-        self.spawn(self.listener)
-
     def on_subscribe(self):
         """Subscribe to lobby CUD listener"""
         lobby_listing = [make_lobby_dict(l) for l in Lobby.query.all()]
@@ -27,21 +24,21 @@ class LobbiesNamespace(BaseNamespace, RedisListenerMixin):
                 g.player.id if g.player else 'Anonymous')
         return True, lobby_listing
 
-    def on_redis_update(self, lobby_info):
+    def on_redis_update(self, channel, lobby_info):
         self.emit('update', lobby_info)
         current_app.logger.debug(
                 'Emitting update with %s to Player %s on Socket %s' %
                 (lobby_info, g.player.id if g.player else
                 'Anonymous', 'None'))
 
-    def on_redis_create(self, lobby_info):
+    def on_redis_create(self, channel, lobby_info):
         self.emit('create', lobby_info)
         current_app.logger.debug(
                 'Emitting create with %s to Player %s on Socket %s' %
                 (lobby_info, g.player.id if g.player else
                 'Anonymous', 'None'))
 
-    def on_redis_delete(self, lobby_id):
+    def on_redis_delete(self, channel, lobby_id):
         self.emit('delete', lobby_id)
         current_app.logger.debug(
                 'Emitting delete with %d to Player %s on Socket %s' %

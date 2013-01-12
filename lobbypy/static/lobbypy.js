@@ -33,6 +33,7 @@ WEB_SOCKET_DEBUG = true;
 $(document).ready(function() {
     var lobby_listing_socket = io.connect('/lobbies');
     var lobby_socket = io.connect('/lobby');
+    var chat_socket = io.connect('/chat');
 
     var LobbyModel = Backbone.Model.extend({});
     var LobbyView = Backbone.View.extend({
@@ -115,8 +116,8 @@ $(document).ready(function() {
             });
         },
 
-        lobby: function() {
-            lobby_socket.emit("join",
+        lobby: function(lobby_id) {
+            lobby_socket.emit("join", lobby_id,
                 function(success, lobby_info) {
                     if (success) {
                         var view = new LobbyView({

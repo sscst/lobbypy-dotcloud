@@ -20,8 +20,7 @@ class LobbiesNamespaceTest(TestCase):
         db.drop_all()
         [ctx.pop() for ctx in self.ctxs]
 
-    @patch('lobbypy.namespaces.base.redis')
-    def _makeOne(self, magic_redis, environ=None, ns_name='lobbies'):
+    def _makeOne(self, environ=None, ns_name='lobbies'):
         from lobbypy.namespaces.lobbies import LobbiesNamespace
         if environ is None:
             environ = {'socketio': MagicMock()}
@@ -31,7 +30,7 @@ class LobbiesNamespaceTest(TestCase):
         # need to call this as it's called by real virtsocket
         ns.initialize()
         ns.spawn = MagicMock()
-        return LobbiesNamespace(environ, ns_name)
+        return ns
 
     def _makeRedisMessage(self, event, *args):
         data = dict()
@@ -39,35 +38,42 @@ class LobbiesNamespaceTest(TestCase):
         data['args'] = args
         return {
                 'type': 'message',
+                'channel': '/lobby/',
                 'data': dumps(data),
                 }
 
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
-    def test_listen_update_message(self, magic_method):
+    @patch('lobbypy.namespaces.base.redis')
+    def test_listen_update_message(self, magic_redis, magic_method):
         lobby_json = {'name':'Lobby'}
         instance = self._makeOne()
-        instance.pubsub = MagicMock()
-        instance.pubsub.listen.return_value = [
+        pubsub = magic_redis.StrictRedis.return_value.pubsub.return_value
+        pubsub.listen.return_value = [
                 self._makeRedisMessage('update', lobby_json)]
+        instance.subscribe('/lobby/')
         instance.listener()
         magic_method.assert_called_once_with('update', lobby_json)
 
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
-    def test_listen_create_message(self, magic_method):
+    @patch('lobbypy.namespaces.base.redis')
+    def test_listen_create_message(self, magic_redis, magic_method):
         lobby_json = {'name':'Lobby'}
         instance = self._makeOne()
-        instance.pubsub = MagicMock()
-        instance.pubsub.listen.return_value = [
+        pubsub = magic_redis.StrictRedis.return_value.pubsub.return_value
+        pubsub.listen.return_value = [
                 self._makeRedisMessage('create', lobby_json)]
+        instance.subscribe('/lobby/')
         instance.listener()
         magic_method.assert_called_once_with('create', lobby_json)
 
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
-    def test_listen_destroy_message(self, magic_method):
+    @patch('lobbypy.namespaces.base.redis')
+    def test_listen_destroy_message(self, magic_redis, magic_method):
         instance = self._makeOne()
-        instance.pubsub = MagicMock()
-        instance.pubsub.listen.return_value = [
+        pubsub = magic_redis.StrictRedis.return_value.pubsub.return_value
+        pubsub.listen.return_value = [
                 self._makeRedisMessage('delete', 1)]
+        instance.subscribe('/lobby/')
         instance.listener()
         magic_method.assert_called_once_with('delete', 1)
 

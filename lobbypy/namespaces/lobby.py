@@ -9,7 +9,6 @@ from .base import BaseNamespace, RedisListenerMixin, RedisBroadcastMixin
 class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
     def initialize(self):
         self.lobby_id = None
-        self.spawn(self.listener)
 
     def get_initial_acl(self):
         return set(['on_join', 'recv_connect'])
@@ -44,7 +43,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         # Do real disconnect logic
         super(LobbyNamespace, self).disconnect(*args, **kwargs)
 
-    def on_redis_update(self, lobby_info):
+    def on_redis_update(self, channel, lobby_info):
         """Send update to user"""
         # Get full list of player ids
         p_ids = [p[id] for p in lobby_info['spectators']]
@@ -61,7 +60,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
             current_app.logger.debug('Emitting leave to Player: %d on Socket: %s',
                     (g.player.id, 'None'))
 
-    def on_redis_delete(self):
+    def on_redis_delete(self, channel):
         """Send delete to user"""
         self.emit('delete')
         current_app.logger.debug('Emitting delete to Player: %s on Socket: %s',
@@ -80,6 +79,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
     # ANON ALLOWED METHODS
     def on_join(self, lobby_id):
         """Join lobby"""
+        lobby_id = int(lobby_id)
         lobby = Lobby.query.get(lobby_id)
         if g.player:
             # Leave or delete old lobbies
@@ -112,7 +112,6 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
     def on_leave(self):
         """Leave lobby"""
         assert self.lobby_id
-        assert self.listener_job
         lobby = Lobby.query.get(self.lobby_id)
         # If we're auth'd do actual leave, otherwise just kill job and lobby_id
         if g.player:

@@ -30,11 +30,16 @@ class RedisBroadcastMixin(object):
 class RedisListenerMixin(object):
     def __init__(self, *args, **kwargs):
         super(RedisListenerMixin, self).__init__(*args, **kwargs)
-        r = redis.StrictRedis()
-        self.pubsub = r.pubsub()
+        self.pubsub = None
 
     def subscribe(self, ns):
-        self.pubsub.subscribe(ns)
+        if not self.pubsub:
+            r = redis.StrictRedis()
+            self.pubsub = r.pubsub()
+            self.pubsub.subscribe(ns)
+            self.spawn(self.listener)
+        else:
+            self.pubsub.subscribe(ns)
 
     def unsubscribe(self, ns):
         self.pubsub.unsubscribe(ns)
@@ -43,7 +48,9 @@ class RedisListenerMixin(object):
         for m in self.pubsub.listen():
             if m['type'] == 'message':
                 data = loads(m['data'])
+                channel = m['channel']
                 event = data.pop('event')
                 method_name = 'on_redis_%s' % event
                 args = data.pop('args', [])
+                args.insert(0, channel)
                 self.call_method(method_name, None, *args)

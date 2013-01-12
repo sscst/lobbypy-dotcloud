@@ -109,15 +109,14 @@ class LobbyNamespaceTest(TestCase):
         db.session.commit()
         instance.lobby_id = l.id
         instance.ctx.g.player = p
+        instance.subscribe('/lobby/%d' % l.id)
         instance.allowed_methods = set(['on_leave',
             'recv_connect', 'on_set_team'])
-        instance.listener_job = MagicMock()
         instance.on_leave()
         self.assertEqual(instance.allowed_methods,
                 set(['on_join', 'on_create_lobby', 'recv_connect']))
         self.assertTrue(instance.lobby_id is None)
         self.assertEqual(len(l.spectators), 0)
-        instance.listener_job.kill.assert_called_once()
 
     @patch('lobbypy.namespaces.base.RedisBroadcastMixin.broadcast_event')
     @patch('lobbypy.namespaces.lobby.make_lobby_item_dict')
