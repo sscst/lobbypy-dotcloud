@@ -7,9 +7,12 @@
 <%def name="main_content()" filter="trim">
 <form class="form-horizontal" action='/admin' method="POST">
   <fieldset>
-    <div id="legend" style="margin: 0px 20px 0px 20px">
+    <div id="legend">
       <legend>Admin Login</legend>
     </div>
+    % if bad_pass:
+      <strong style="color: red;">Invalid Password</strong>
+    % endif
     <div class="control-group">
       <p class="control-label">Username</p>
       <div class="controls">

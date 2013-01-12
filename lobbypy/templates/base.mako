@@ -10,16 +10,10 @@
   ${utils.js_link("json2.js")}
   ${utils.js_link("underscore-min.js")}
   ${utils.js_link("backbone-min.js")}
-  % for ns in context.namespaces.values():
-    % if hasattr(ns, 'js'):
-      ${ns.js() | trim}
-    % endif
-    % if hasattr(ns, 'hb'):
-      ${ns.hb() | trim}
-    % endif
-  % endfor
+  ${next.js() | trim}
   ${utils.css_link("bootstrap.min.css")}
   ${utils.css_link("default.css")}
+  <%include file="handlebars.mako"/>
   <title>LobbyPy</title>
 </head>
 <body data-spy="scroll" data-target=".subnav" data-offset="50">

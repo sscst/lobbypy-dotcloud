@@ -30,6 +30,7 @@ ul#lobbylist {
 	overflow: auto;
 	position: relative;
 	padding: 5px 5px 5px 5px;
+	margin: 0px 7px 0px 7px;
 	border: 1px black solid;
 }
 
@@ -118,6 +119,78 @@ ul#lobbylist {
 	text-align: center;
 	vertical-align: text-top;
 	background-color: #80a1c2;
+}
+
+/* admin */
+#admin-lobby-list {
+	list-style: none;
+	display: list-item;
+	margin: 5px 5px 5px 5px;
+}
+
+#admin-lobby-list .ui-selecting {
+	background-color: #999999;
+	color: #000000;
+       
+}
+
+#admin-lobby-list .ui-selected {
+	background-color: #54748b;
+	color: #ffffff;
+}
+
+.admin-lobbyitem {
+	border: 1px #575757 solid;
+	color: #ffffff;
+	background-color: #737373;
+	margin: 5px 5px 5px 5px;
+}
+
+.admin-lobbytable {
+	background-color: #ffffff;
+}
+
+.admin-lobbytable .redh,
+.admin-lobbytable .bluh {
+	text-align: center;
+	vertical-align: text-top;
+	padding: 5px 30px 5px 30px;
+	border: none;
+	color: #ffffff;
+}
+
+.admin-lobbytable .redh {
+	background-color: #c15143;
+}
+
+.admin-lobbytable .bluh {
+	background-color: #80a1c2;
+}
+
+ul#admin-blu-lobbyplayers,
+ul#admin-red-lobbyplayers {
+	list-style: none;
+	margin: 0 0 0 0;
+	text-align: center;
+}
+
+l#admin-blu-lobbyplayers .ui-selecting
+#admin-red-lobbyplayers .ui-selecting,
+{
+	background-color: #999999;
+	color: #000000;
+}
+
+#admin-blu-lobbyplayers .ui-selected
+#admin-red-lobbyplayers .ui-selected,
+{
+	background-color: #54748b;
+	color: #ffffff;
+}
+
+.admin-red-player,
+.admin-blu-player {
+
 }
 
 /* bootstrap */
@@ -293,7 +366,7 @@ i {
 
 .row-white {
 	color: #383838;
-	padding: 8px 8px 8px 8px;
+	padding: 8px 20px 8px 20px;
 	background-color: #fafafa;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
