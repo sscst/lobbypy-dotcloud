@@ -188,7 +188,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         self.add_acl_method('on_set_team_name')
         # Set lobby id and start listening on redis
         self.lobby_id = lobby.id
-        self.listener_job = self.spawn(self.listener, '/lobby/%d' % lobby.id)
+        self.subscribe('/lobby/%d' % lobby.id)
         current_app.logger.info('Player %d created Lobby %d' % (g.player.id,
             lobby.id))
         return True, lobby.id
