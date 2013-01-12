@@ -15,7 +15,7 @@ from flask import (
 from flask.ext.mako import render_template
 from lobbypy.utils import oid, db
 from lobbypy.models import Player
-from lobbypy.namespaces import LobbiesNamespace, LobbyNamespace
+from lobbypy.namespaces import LobbiesNamespace, LobbyNamespace, ChatNamespace
 from .utils import admin_check
 from .rest import (
         PlayerAPI,
@@ -96,6 +96,7 @@ def run_socketio(path):
     socketio_manage(real_request.environ, {
             '/lobbies': LobbiesNamespace,
             '/lobby': LobbyNamespace,
+            '/chat': ChatNamespace,
         },
         request=(real_app, real_request))
     return Response()
