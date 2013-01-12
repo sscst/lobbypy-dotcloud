@@ -43,40 +43,31 @@ class LobbiesNamespaceTest(TestCase):
                 }
 
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
-    @patch('lobbypy.namespaces.base.redis')
-    def test_listen_update_message(self, magic_module, magic_method):
+    def test_listen_update_message(self, magic_method):
         lobby_json = {'name':'Lobby'}
-        redis = magic_module.StrictRedis.return_value
-        pubsub = redis.pubsub.return_value
-
-        pubsub.listen.return_value = [
-                self._makeRedisMessage('update', lobby_json)]
         instance = self._makeOne()
+        instance.pubsub = MagicMock()
+        instance.pubsub.listen.return_value = [
+                self._makeRedisMessage('update', lobby_json)]
         instance.listener()
         magic_method.assert_called_once_with('update', lobby_json)
 
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
-    @patch('lobbypy.namespaces.base.redis')
-    def test_listen_create_message(self, magic_module, magic_method):
+    def test_listen_create_message(self, magic_method):
         lobby_json = {'name':'Lobby'}
-        redis = magic_module.StrictRedis.return_value
-        pubsub = redis.pubsub.return_value
-
-        pubsub.listen.return_value = [
-                self._makeRedisMessage('create', lobby_json)]
         instance = self._makeOne()
+        instance.pubsub = MagicMock()
+        instance.pubsub.listen.return_value = [
+                self._makeRedisMessage('create', lobby_json)]
         instance.listener()
         magic_method.assert_called_once_with('create', lobby_json)
 
     @patch('lobbypy.namespaces.lobbies.LobbiesNamespace.emit')
-    @patch('lobbypy.namespaces.base.redis')
-    def test_listen_destroy_message(self, magic_module, magic_method):
-        redis = magic_module.StrictRedis.return_value
-        pubsub = redis.pubsub.return_value
-
-        pubsub.listen.return_value = [
-                self._makeRedisMessage('delete', 1)]
+    def test_listen_destroy_message(self, magic_method):
         instance = self._makeOne()
+        instance.pubsub = MagicMock()
+        instance.pubsub.listen.return_value = [
+                self._makeRedisMessage('delete', 1)]
         instance.listener()
         magic_method.assert_called_once_with('delete', 1)
 
