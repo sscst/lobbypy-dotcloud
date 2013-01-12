@@ -5,11 +5,13 @@ from lobbypy.models import Lobby, Player, make_lobby_item_dict
 from .base import BaseNamespace, RedisListenerMixin
 
 class LobbiesNamespace(BaseNamespace, RedisListenerMixin):
+    def initialize(self):
+        self.spawn(self.listener)
+
     def on_subscribe(self):
         """Subscribe to lobby CUD listener"""
         lobby_listing = [make_lobby_dict(l) for l in Lobby.query.all()]
         self.subscribe('/lobby/')
-        self.spawn(self.listener)
         current_app.logger.info('Player: %s subscribed to LobbiesNamespace' %
                 g.player.id if g.player else 'Anonymous')
         return True, lobby_listing
