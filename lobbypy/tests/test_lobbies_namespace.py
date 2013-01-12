@@ -30,7 +30,7 @@ class LobbiesNamespaceTest(TestCase):
         # need to call this as it's called by real virtsocket
         ns.initialize()
         ns.spawn = MagicMock()
-        return LobbiesNamespace(environ, ns_name)
+        return ns
 
     def _makeRedisMessage(self, event, *args):
         data = dict()
