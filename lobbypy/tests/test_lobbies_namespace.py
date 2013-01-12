@@ -38,6 +38,7 @@ class LobbiesNamespaceTest(TestCase):
         data['args'] = args
         return {
                 'type': 'message',
+                'channel': '/lobby/',
                 'data': dumps(data),
                 }
 

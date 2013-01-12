@@ -2,6 +2,7 @@ import re
 from flask import g
 from .base import BaseNamespace, RedisListenerMixin, RedisBroadcastMixin
 
+channel_pattern = re.compile('/chat/(?P<type>\w+)/(?P<dest>\w+)')
 class ChatNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
     def initialize(self):
         self.spawn(self.listener)
@@ -11,6 +12,12 @@ class ChatNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
 
     def get_channel_name(self, channel):
         return '/chat/%s/%s' % (channel['type'], channel['dest'])
+
+    def get_channel_from_name(self, name):
+        m = channel_pattern.match(name)
+        if not m:
+            raise ValueError
+        return {'type':m['type'], 'dest':m['dest']}
 
     def recv_connect(self):
         if g.player:
@@ -36,13 +43,14 @@ class ChatNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
             return False
         if self.verify(data):
             self.broadcast_event(self.get_channel_name(channel), 'send',
-                    channel, g.player.id, data)
+                    g.player.id, data)
             return True
         return False
 
-    def on_redis_send(self, channel, sender_id, data):
+    def on_redis_send(self, channel_name, sender_id, data):
         player = Player.query.get(sender_id)
         assert player
+        channel = self.get_channel_from_name(channel_name)
         self.emit('message', channel, make_player_dict(player), data)
 
     def subscribe_allowed(self, channel):

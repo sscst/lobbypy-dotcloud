@@ -44,7 +44,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         # Do real disconnect logic
         super(LobbyNamespace, self).disconnect(*args, **kwargs)
 
-    def on_redis_update(self, lobby_info):
+    def on_redis_update(self, channel, lobby_info):
         """Send update to user"""
         # Get full list of player ids
         p_ids = [p[id] for p in lobby_info['spectators']]
@@ -61,7 +61,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
             current_app.logger.debug('Emitting leave to Player: %d on Socket: %s',
                     (g.player.id, 'None'))
 
-    def on_redis_delete(self):
+    def on_redis_delete(self, channel):
         """Send delete to user"""
         self.emit('delete')
         current_app.logger.debug('Emitting delete to Player: %s on Socket: %s',

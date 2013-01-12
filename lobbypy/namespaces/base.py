@@ -43,7 +43,9 @@ class RedisListenerMixin(object):
         for m in self.pubsub.listen():
             if m['type'] == 'message':
                 data = loads(m['data'])
+                channel = m['channel']
                 event = data.pop('event')
                 method_name = 'on_redis_%s' % event
                 args = data.pop('args', [])
+                args.insert(0, channel)
                 self.call_method(method_name, None, *args)

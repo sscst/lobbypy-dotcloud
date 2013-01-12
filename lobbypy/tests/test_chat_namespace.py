@@ -32,15 +32,6 @@ class ChatNamespaceTest(TestCase):
         ns.initialize()
         return ns
 
-    def _makeRedisMessage(self, event, *args):
-        data = dict()
-        data['event'] = event
-        data['args'] = args
-        return {
-                'type': 'message',
-                'data': dumps(data),
-                }
-
     def test_on_join(self):
         instance = self._makeOne()
         instance.on_join({'type':'channel', 'dest':'root'})
@@ -63,4 +54,4 @@ class ChatNamespaceTest(TestCase):
         instance.pubsub.subscribe('/chat/channel/root')
         rv = instance.on_send({'type':'channel', 'dest':'root'}, 'test')
         magic_broadcast.assert_called_once_with('/chat/channel/root', 'send',
-                {'type':'channel', 'dest':'root'}, player.id, 'test')
+                player.id, 'test')
