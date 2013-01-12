@@ -45,6 +45,8 @@ class RedisListenerMixin(object):
         self.pubsub.unsubscribe(ns)
 
     def listener(self):
+        ctx = self.ctx.app.request_context(self.ctx.request.environ)
+        ctx.push()
         for m in self.pubsub.listen():
             if m['type'] == 'message':
                 data = loads(m['data'])
@@ -54,3 +56,5 @@ class RedisListenerMixin(object):
                 args = data.pop('args', [])
                 args.insert(0, channel)
                 self.call_method(method_name, None, *args)
+        ctx.pop()
+
