@@ -50,6 +50,7 @@ class LobbiesNamespaceTest(TestCase):
         pubsub = magic_redis.StrictRedis.return_value.pubsub.return_value
         pubsub.listen.return_value = [
                 self._makeRedisMessage('update', lobby_json)]
+        instance.subscribe('/lobby/')
         instance.listener()
         magic_method.assert_called_once_with('update', lobby_json)
 
@@ -61,6 +62,7 @@ class LobbiesNamespaceTest(TestCase):
         pubsub = magic_redis.StrictRedis.return_value.pubsub.return_value
         pubsub.listen.return_value = [
                 self._makeRedisMessage('create', lobby_json)]
+        instance.subscribe('/lobby/')
         instance.listener()
         magic_method.assert_called_once_with('create', lobby_json)
 
@@ -71,6 +73,7 @@ class LobbiesNamespaceTest(TestCase):
         pubsub = magic_redis.StrictRedis.return_value.pubsub.return_value
         pubsub.listen.return_value = [
                 self._makeRedisMessage('delete', 1)]
+        instance.subscribe('/lobby/')
         instance.listener()
         magic_method.assert_called_once_with('delete', 1)
 

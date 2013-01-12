@@ -30,11 +30,16 @@ class RedisBroadcastMixin(object):
 class RedisListenerMixin(object):
     def __init__(self, *args, **kwargs):
         super(RedisListenerMixin, self).__init__(*args, **kwargs)
-        r = redis.StrictRedis()
-        self.pubsub = r.pubsub()
+        self.pubsub = None
 
     def subscribe(self, ns):
-        self.pubsub.subscribe(ns)
+        if not self.pubsub:
+            r = redis.StrictRedis()
+            self.pubsub = r.pubsub()
+            self.pubsub.subscribe(ns)
+            self.spawn(self.listener)
+        else:
+            self.pubsub.subscribe(ns)
 
     def unsubscribe(self, ns):
         self.pubsub.unsubscribe(ns)

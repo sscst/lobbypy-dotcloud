@@ -4,11 +4,8 @@ from .base import BaseNamespace, RedisListenerMixin, RedisBroadcastMixin
 
 channel_pattern = re.compile('/chat/(?P<type>\w+)/(?P<dest>\w+)')
 class ChatNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
-    def initialize(self):
-        self.spawn(self.listener)
-
     def get_initial_acl(self):
-        return set(['on_join', 'on_part'])
+        return set(['on_join', 'on_part', 'recv_connect'])
 
     def get_channel_name(self, channel):
         return '/chat/%s/%s' % (channel['type'], channel['dest'])

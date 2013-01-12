@@ -39,7 +39,7 @@ class ChatNamespaceTest(TestCase):
 
     def test_on_part(self):
         instance = self._makeOne()
-        instance.pubsub.subscribe('/chat/channel/root')
+        instance.subscribe('/chat/channel/root')
         instance.on_part({'type':'channel', 'dest':'root'})
         self.assertTrue('/chat/channel/root' not in instance.pubsub.channels)
 
@@ -51,7 +51,7 @@ class ChatNamespaceTest(TestCase):
         db.session.commit()
         instance = self._makeOne()
         g.player = player
-        instance.pubsub.subscribe('/chat/channel/root')
+        instance.subscribe('/chat/channel/root')
         rv = instance.on_send({'type':'channel', 'dest':'root'}, 'test')
         magic_broadcast.assert_called_once_with('/chat/channel/root', 'send',
                 player.id, 'test')

@@ -9,7 +9,6 @@ from .base import BaseNamespace, RedisListenerMixin, RedisBroadcastMixin
 class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
     def initialize(self):
         self.lobby_id = None
-        self.spawn(self.listener)
 
     def get_initial_acl(self):
         return set(['on_join', 'recv_connect'])
@@ -80,6 +79,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
     # ANON ALLOWED METHODS
     def on_join(self, lobby_id):
         """Join lobby"""
+        lobby_id = int(lobby_id)
         lobby = Lobby.query.get(lobby_id)
         if g.player:
             # Leave or delete old lobbies
@@ -112,7 +112,6 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
     def on_leave(self):
         """Leave lobby"""
         assert self.lobby_id
-        assert self.listener_job
         lobby = Lobby.query.get(self.lobby_id)
         # If we're auth'd do actual leave, otherwise just kill job and lobby_id
         if g.player:
