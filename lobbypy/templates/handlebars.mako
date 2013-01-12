@@ -21,3 +21,30 @@
     </div>
   </div>
 </script>
+<script id="lobby_template" type="text/x-handlebars-template">
+  <div class="row">
+    <div class="span6">
+      <h2>{{title}}</h2>
+      <div class="span3">
+        <div class="map-img"></div>
+      </div>
+      <div class="span2">
+        <div class="map-details">
+          <p class="map-name">{{game_map}}</p>
+          <p class="option-value">Control Points</p>
+          <p class="option-value">30 minutes</p>
+          <p class="option-value">5 wins</p>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <table class="lobbytable">
+        <tr>
+          <th class="bluh">BLU</th>
+          <th class="cih" width="25"></th>
+          <th class="redh">RED</th>
+        </tr>
+      </table>
+    </div>
+  </div>
+</script>
