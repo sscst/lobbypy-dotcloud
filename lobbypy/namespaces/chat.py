@@ -1,5 +1,6 @@
 import re
-from flask import g
+from flask import g, current_app
+from lobbypy.models import Player, make_player_dict
 from .base import BaseNamespace, RedisListenerMixin, RedisBroadcastMixin
 
 channel_pattern = re.compile('/chat/(?P<type>\w+)/(?P<dest>\w+)')
@@ -14,7 +15,7 @@ class ChatNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         m = channel_pattern.match(name)
         if not m:
             raise ValueError
-        return {'type':m['type'], 'dest':m['dest']}
+        return {'type':m.group('type'), 'dest':m.group('dest')}
 
     def recv_connect(self):
         if g.player:
@@ -22,7 +23,8 @@ class ChatNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
 
     def on_join(self, channel):
         if self.subscribe_allowed(channel):
-            print 'Allowed'
+            current_app.logger.info('Player: %s joined channel: %s' % (
+                g.player.id if g.player else 'Anonymous', channel))
             self.subscribe(self.get_channel_name(channel))
             return True
         return False
@@ -39,6 +41,8 @@ class ChatNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         if not self.publish_allowed(channel):
             return False
         if self.verify(data):
+            current_app.logger.info('Player %s sent: %s to channel: %s' % (
+                g.player.id if g.player else 'Anonymous', data, channel))
             self.broadcast_event(self.get_channel_name(channel), 'send',
                     g.player.id, data)
             return True
