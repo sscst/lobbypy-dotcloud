@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from socketio.server import SocketIOServer
 from flask import Flask
 from lobbypy.utils import db, mako, oid, cache
@@ -22,7 +23,8 @@ def config_app(app, **config):
         app.config['CACHE_REDIS_PASSWORD'] = config.get('CACHE_REDIS_PASSWORD',
                 None)
     ADMIN_URL = config.get('ADMIN_URL', '/admin')
-    app.config['ADMIN_AUTH_TIMEOUT'] = config.get('ADMIN_AUTH_TIMEOUT', 5)
+    app.config['ADMIN_AUTH_TIMEOUT'] = config.get('ADMIN_AUTH_TIMEOUT',
+            timedelta(hours=1))
 
     mako.init_app(app)
     db.init_app(app)
