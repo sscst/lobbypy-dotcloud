@@ -83,7 +83,7 @@ def admin():
                 'bad_pass': True
             })
         session['auth_time'] = datetime.now()
-        redirect(url_for('admin'))
+        return redirect(url_for('admin'))
     if not g.admin_authed:
         # this admin has yet to log in
         return render_template('admin_login.mako')
