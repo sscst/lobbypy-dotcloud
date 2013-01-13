@@ -18,6 +18,7 @@
           {{/each}}
         </ul>
       </div>
+      <button class="btn btn-success pull-right"><i class="icon-plus"></i> New lobby</button>
     </div>
   </div>
 </script>
