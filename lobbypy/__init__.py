@@ -22,7 +22,7 @@ def config_app(app, **config):
         app.config['CACHE_REDIS_PORT'] = config.get('CACHE_REDIS_PORT', None)
         app.config['CACHE_REDIS_PASSWORD'] = config.get('CACHE_REDIS_PASSWORD',
                 None)
-    ADMIN_URL = config.get('ADMIN_URL', '/admin')
+    ADMIN_URL = config.get('ADMIN_URL', 'admin')
     app.config['ADMIN_AUTH_TIMEOUT'] = config.get('ADMIN_AUTH_TIMEOUT',
             timedelta(hours=1))
 
@@ -36,7 +36,7 @@ def config_app(app, **config):
     app.add_url_rule('/', view_func=views.index)
     app.add_url_rule('/login', view_func=views.login)
     app.add_url_rule('/logout', view_func=views.logout)
-    app.add_url_rule(ADMIN_URL, view_func=views.admin, methods=['GET', 'POST'])
+    app.add_url_rule('/%s' % ADMIN_URL, view_func=views.admin, methods=['GET', 'POST'])
     app.add_url_rule('/socket.io/<path:path>', view_func=views.run_socketio)
 
     app.before_request(views.before_request)
