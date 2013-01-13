@@ -14,7 +14,6 @@
   ${utils.css_link("bootstrap.min.css")}
   ${utils.css_link("default.css")}
   <%include file="handlebars.mako"/>
-  ## ${next.css() | trim}
   <title>LobbyPy</title>
 </head>
 <body data-spy="scroll" data-target=".subnav" data-offset="50">

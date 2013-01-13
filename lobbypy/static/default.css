@@ -30,6 +30,7 @@ ul#lobbylist {
 	overflow: auto;
 	position: relative;
 	padding: 5px 5px 5px 5px;
+	margin: 0px 0px 10px 0px;
 	border: 1px black solid;
 }
 
@@ -120,6 +121,67 @@ ul#lobbylist {
 	background-color: #80a1c2;
 }
 
+/* admin */
+#admin-lobby-list {
+	list-style: none;
+	display: list-item;
+	margin: 5px 5px 5px 5px;
+}
+
+#admin-lobby-list .picked {
+	background-color: #54748b;
+	color: #ffffff;
+}
+
+.admin-lobbyitem {
+	border: 1px #575757 solid;
+	color: #ffffff;
+	background-color: #737373;
+	margin: 5px 5px 5px 5px;
+}
+
+.admin-lobbytable {
+	background-color: #ffffff;
+}
+
+.admin-lobbytable .redh,
+.admin-lobbytable .bluh {
+	text-align: center;
+	vertical-align: text-top;
+	padding: 5px 30px 5px 30px;
+	border: none;
+	color: #ffffff;
+}
+
+.admin-lobbytable .redh {
+	background-color: #c15143;
+}
+
+.admin-lobbytable .bluh {
+	background-color: #80a1c2;
+}
+
+ul.admin-lobbyplayers {
+	list-style: none;
+	margin: 0 0 0 0;
+	text-align: center;
+}
+
+.admin-lobbyplayers .ui-selecting {
+	background-color: #999999;
+	color: #000000;
+}
+
+.admin-lobbyplayers .ui-selected {
+	background-color: #54748b;
+	color: #ffffff;
+}
+
+.admin-red-player,
+.admin-blu-player {
+
+}
+
 /* bootstrap */
 
 .tooltip-inner {
@@ -129,22 +191,6 @@ ul#lobbylist {
 .tooltip.in {
 	opacity: 1.0;
 	filter: alpha(opacity=100);
-}
-
-.pagination a {
-	background-color: #ffffff;
-}
-
-.text-inverse {
-	color: #000000;
-}
-
-.text-basic {
-	color: #888888;
-}
-
-.pagination .disabled span, .pagination .disabled a, .pagination .disabled a:hover {
-	background-color: #eeeeee;
 }
 
 .navbar {
@@ -191,10 +237,6 @@ i {
 	background: linear-gradient(to bottom,  rgba(83,90,99,1) 0%,rgba(39,42,45,1) 36%,rgba(12,16,18,1) 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#535a63', endColorstr='#0c1012',GradientType=0 ); /* IE6-9 */
 	border: 0;
-}
-
-.navbar input {
-	margin-bottom: 0;
 }
 
 .navbar-fixed-top .container, .navbar-fixed-bottom .container {
@@ -293,7 +335,7 @@ i {
 
 .row-white {
 	color: #383838;
-	padding: 8px 8px 8px 8px;
+	padding: 8px 20px 8px 20px;
 	background-color: #fafafa;
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
@@ -306,16 +348,6 @@ i {
 .row-white td,
 .row-white th {
 	vertical-align:text-top;
-}
-
-.row-gradient {
-	background-color: #fafafa; /* Old browsers */
-	background: rgba(255, 255, 255, 0.92); 
-}
-
-.row-content {
-	padding:15px;
-	width:910px;
 }
 
 /* reduce margin to improve dropdowns */
