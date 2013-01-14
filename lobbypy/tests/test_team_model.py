@@ -27,19 +27,19 @@ class TeamModelTest(TestCase):
         instance.players.append(lp)
         self.assertEqual(len(instance), 1)
 
-    def test_has_player(self):
+    def test_contains(self):
         instance = self._makeOne()
         from lobbypy.models import Player, LobbyPlayer
         p = Player('0')
         lp = LobbyPlayer(p)
         instance.players.append(lp)
-        self.assertTrue(instance.has_player(p))
+        self.assertTrue(p in instance)
 
-    def test_not_has_player(self):
+    def test_not_contains(self):
         instance = self._makeOne()
         from lobbypy.models import Player
         p = Player('0')
-        self.assertTrue(not instance.has_player(p))
+        self.assertTrue(not p in instance)
 
     def test_get_lobby_player(self):
         instance = self._makeOne()

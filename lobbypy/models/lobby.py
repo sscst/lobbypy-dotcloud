@@ -8,6 +8,7 @@ spectator_table = db.Table('spectator', db.metadata,
 class Lobby(db.Model):
     __tablename__ = 'lobby'
     id = db.Column(db.Integer, primary_key=True)
+    discriminator = db.Column('type', db.String)
     name = db.Column(db.String, nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False,
             unique=True)
@@ -19,6 +20,8 @@ class Lobby(db.Model):
     rcon_password = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
     game_map = db.Column(db.String, nullable=False)
+    __mapper_args__ = {'polymorphic_on': discriminator,
+            'polymorphic_identity': 'generic'}
 
     def __init__(self, name, owner, server_address, rcon_password, game_map, password):
         self.name = name
@@ -28,6 +31,13 @@ class Lobby(db.Model):
         self.game_map = game_map
         self.password = password
 
+    def __contains__(self, player):
+        return player in self.spectators or any([player in t for t in
+            self.teams])
+
+    def __len__(self):
+        return self.player_count + self.spectator_count
+
     @property
     def player_count(self):
         return sum([len(t) for t in self.teams])
@@ -35,10 +45,6 @@ class Lobby(db.Model):
     @property
     def spectator_count(self):
         return len(self.spectators)
-
-    def has_player(self, player):
-        return player in self.spectators or any([t.has_player(player) for t in
-            self.teams])
 
     def join(self, player):
         self.spectators.append(player)
@@ -49,7 +55,7 @@ class Lobby(db.Model):
             return player
         else:
             for team in self.teams:
-                if team.has_player(player):
+                if player in team:
                     return team.pop_player(player)
 
     def leave(self, player):
@@ -57,7 +63,7 @@ class Lobby(db.Model):
             self.spectators.remove(player)
         else:
             for team in self.teams:
-                if team.has_player(player):
+                if player in team:
                     team.remove_player(player)
 
     def set_team(self, player, team_id):
@@ -73,19 +79,25 @@ class Lobby(db.Model):
 
     def set_class(self, player, class_id):
         for team in self.teams:
-            if team.has_player(player):
+            if player in team:
                 team.set_class(player, class_id)
 
     def is_ready_player(self, player):
         for team in self.teams:
-            if team.has_player(player):
+            if player in team:
                 lp = team.get_lobby_player(player)
                 return lp.ready
 
     def toggle_ready(self, player):
         for team in self.teams:
-            if team.has_player(player):
+            if player in team:
                 team.toggle_ready(player)
+
+class HighlanderLobby(Lobby):
+    __mapper_args__ = {'polymorphic_identity': 'highlander'}
+
+class SixesLobby(Lobby):
+    __mapper_args__ = {'polymorphic_identity': 'sixes'}
 
 class Team(db.Model):
     __tablename__ = 'team'
@@ -101,8 +113,8 @@ class Team(db.Model):
     def __len__(self):
         return len(self.players)
 
-    def has_player(self, player):
-        return any([lp.player.id == player.id for lp in self.players])
+    def __contains__(self, player):
+        return any([lp.player == player for lp in self.players])
 
     def get_lobby_player(self, player):
         lps = [lp for lp in self.players if lp.player.id == player.id]

@@ -260,7 +260,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         player = Player.query.get(player_id)
         if player is None:
             return False, 'player_dne'
-        if not lobby.has_player(player):
+        if not player in lobby:
             return False, 'player_dne_lobby'
         lobby.leave(player)
         db.session.commit()
