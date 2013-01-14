@@ -47,9 +47,19 @@ class Lobby(db.Model):
         return len(self.spectators)
 
     def join(self, player):
+        # TODO: do we complain here, or act like a set and ignore double joins?
+        assert player not in self
         self.spectators.append(player)
 
-    def pop_player(self, player):
+    def leave(self, player):
+        if player in self.spectators:
+            self.spectators.remove(player)
+        else:
+            for team in self.teams:
+                if player in team:
+                    team.leave(player)
+
+    def _pop(self, player):
         if player in self.spectators:
             self.spectators.remove(player)
             return player
@@ -58,16 +68,8 @@ class Lobby(db.Model):
                 if player in team:
                     return team.pop_player(player)
 
-    def leave(self, player):
-        if player in self.spectators:
-            self.spectators.remove(player)
-        else:
-            for team in self.teams:
-                if player in team:
-                    team.remove_player(player)
-
     def set_team(self, player, team_id):
-        our_player = self.pop_player(player)
+        our_player = self._pop(player)
         if team_id is None:
             self.spectators.append(player)
         else:
@@ -75,12 +77,10 @@ class Lobby(db.Model):
             if isinstance(our_player, LobbyPlayer):
                 team.append(our_player)
             else:
-                team.append_player(player)
+                team.join(player)
 
     def set_class(self, player, class_id):
-        for team in self.teams:
-            if player in team:
-                team.set_class(player, class_id)
+        [t.set_class(player, class_id) for t in self.teams if player in t]
 
     def is_ready_player(self, player):
         for team in self.teams:
@@ -89,9 +89,7 @@ class Lobby(db.Model):
                 return lp.ready
 
     def toggle_ready(self, player):
-        for team in self.teams:
-            if player in team:
-                team.toggle_ready(player)
+        [t.toggle_ready(player) for t in self.teams if player in t]
 
 class HighlanderLobby(Lobby):
     __mapper_args__ = {'polymorphic_identity': 'highlander'}
@@ -120,23 +118,27 @@ class Team(db.Model):
         return any([lp.player == player for lp in self.players])
 
     def get_lobby_player(self, player):
-        lps = [lp for lp in self.players if lp.player.id == player.id]
+        lps = [lp for lp in self.players if lp.player == player]
         return lps.pop()
 
     def append(self, lobby_player):
         self.players.append(lobby_player)
+
+    def remove(self, lobby_player):
+        self.players.remove(lobby_player)
 
     def pop_player(self, player):
         lp = self.get_lobby_player(player)
         self.players.remove(lp)
         return lp
 
-    def append_player(self, player):
-        self.players.append(LobbyPlayer(player))
+    def join(self, player):
+        assert player not in self
+        self.append(LobbyPlayer(player))
 
-    def remove_player(self, player):
+    def leave(self, player):
         lp = self.get_lobby_player(player)
-        self.players.remove(lp)
+        self.remove(lp)
 
     def set_class(self, player, class_id):
         lp = self.get_lobby_player(player)

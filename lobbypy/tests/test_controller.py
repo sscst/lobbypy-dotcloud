@@ -70,7 +70,7 @@ class ControllersTest(TestCase):
         l = Lobby('test', o, 'test', 'test', 'test', 'test')
         t = Team('Red')
         l.teams.append(t)
-        l.teams[0].append_player(p)
+        l.teams[0].join(p)
         db.session.add(l)
         db.session.commit()
         rv = self._callFUT(p)

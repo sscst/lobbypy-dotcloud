@@ -226,7 +226,7 @@ class LobbyPlayerListingAPI(MethodView):
         p = Player.query.get(p_id)
         if not p:
             abort(405)
-        t.append_player(p)
+        t.join(p)
         db.session.commit()
         return jsonify(201)
 
@@ -276,6 +276,6 @@ class LobbyPlayerAPI(MethodView):
         p = Player.query.get(player_id)
         if not p or p not in t:
             abort(404)
-        t.remove_player(p)
+        t.leave(p)
         db.session.commit()
         return jsonify(200)

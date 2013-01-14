@@ -65,11 +65,11 @@ class TeamModelTest(TestCase):
         self.assertEqual(len(instance.players), 1)
         self.assertEqual(instance.players[0], lp)
 
-    def test_append_player(self):
+    def test_join(self):
         instance = self._makeOne()
         from lobbypy.models import Player
         p = Player('0')
-        instance.append_player(p)
+        instance.join(p)
         self.assertEqual(len(instance.players), 1)
         self.assertEqual(instance.players[0].player, p)
 
@@ -83,13 +83,13 @@ class TeamModelTest(TestCase):
         self.assertEqual(rv, lp)
         self.assertEqual(len(instance.players), 0)
 
-    def test_remove_player(self):
+    def test_leave(self):
         instance = self._makeOne()
         from lobbypy.models import Player, LobbyPlayer
         p = Player('0')
         lp = LobbyPlayer(p)
         instance.players.append(lp)
-        instance.remove_player(p)
+        instance.leave(p)
         self.assertEqual(len(instance.players), 0)
 
     def test_set_class(self):
