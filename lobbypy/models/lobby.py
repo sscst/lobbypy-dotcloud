@@ -102,10 +102,13 @@ class SixesLobby(Lobby):
 class Team(db.Model):
     __tablename__ = 'team'
     id = db.Column(db.Integer, primary_key=True)
+    discriminator = db.Column('type', db.String)
     name = db.Column(db.String, nullable=False)
     lobby_id = db.Column(db.Integer, db.ForeignKey('lobby.id'), nullable=False)
     players = db.relationship('LobbyPlayer', backref='team',
             cascade='save-update,merge,delete,delete-orphan')
+    __mapper_args__ = {'polymorphic_on': discriminator,
+            'polymorphic_identity': 'generic'}
 
     def __init__(self, name):
         self.name = name
@@ -142,6 +145,12 @@ class Team(db.Model):
     def toggle_ready(self, player):
         lp = self.get_lobby_player(player)
         lp.ready = not lp.ready
+
+class HighlanderTeam(Team):
+    __mapper_args__ = {'polymorphic_identity': 'highlander'}
+
+class SixesTeam(Team):
+    __mapper_args__ = {'polymorphic_identity': 'sixes'}
 
 class LobbyPlayer(db.Model):
     __tablename__ = 'lobby_player'
