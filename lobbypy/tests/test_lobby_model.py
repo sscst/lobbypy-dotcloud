@@ -21,7 +21,7 @@ class LobbyModelTest(TestCase):
         if owner is None:
             from lobbypy.models import Player
             owner = Player('-1')
-        return Lobby(name, owner, server_address, game_map, password)
+        return Lobby(name, owner, server_address, game_map, password, teams=[])
 
     def test_player_count(self):
         instance = self._makeOne()
@@ -77,6 +77,7 @@ class LobbyModelTest(TestCase):
         lp = LobbyPlayer(p)
         t.players.append(lp)
         instance.teams.append(t)
+        print len(instance.teams)
         instance.set_class(p, 0)
         self.assertEqual(instance.teams[0].players[0].class_id, 0)
 

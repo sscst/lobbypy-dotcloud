@@ -40,8 +40,7 @@ class LobbyNamespaceTest(TestCase):
         if owner is None:
             from lobbypy.models import Player
             owner = Player('-1')
-        return Lobby(name, owner, server_address, game_map, password)
-
+        return Lobby(name, owner, server_address, game_map, password, teams=[])
 
     def _makeRedisMessage(self, data_type, **data):
         data['type'] = data_type

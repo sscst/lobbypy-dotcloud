@@ -22,12 +22,15 @@ class Lobby(db.Model):
     __mapper_args__ = {'polymorphic_on': discriminator,
             'polymorphic_identity': 'generic'}
 
-    def __init__(self, name, owner, server_address, game_map, password):
+    def __init__(self, name, owner, server_address, game_map, password,
+            teams=None):
         self.name = name
         self.owner = owner
         self.server_address = server_address
         self.game_map = game_map
         self.password = password
+        if teams is None:
+            self.teams = self._defaultTeams()
 
     def __contains__(self, player):
         return player in self.spectators or any([player in t for t in
@@ -35,6 +38,9 @@ class Lobby(db.Model):
 
     def __len__(self):
         return self.player_count + self.spectator_count
+
+    def _defaultTeams(self):
+        return [Team('Red'), Team('Blu')]
 
     @property
     def player_count(self):
@@ -92,8 +98,14 @@ class Lobby(db.Model):
 class HighlanderLobby(Lobby):
     __mapper_args__ = {'polymorphic_identity': 'highlander'}
 
+    def _defaultTeams(self):
+        return [HighlanderTeam('Red'), HighlanderTeam('Blu')]
+
 class SixesLobby(Lobby):
     __mapper_args__ = {'polymorphic_identity': 'sixes'}
+
+    def _defaultTeams(self):
+        return [SixesTeam('Red'), SixesTeam('Blu')]
 
 class Team(db.Model):
     __tablename__ = 'team'
