@@ -169,7 +169,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         # Leave or delete old lobbies
         lobby_deletes = leave_or_delete_all_lobbies(g.player)
         # TODO: pull/generate password from list
-        lobby = Lobby(name, g.player, server_address, rcon_password, game_map, 'password')
+        lobby = Lobby(name, g.player, server_address, game_map, 'password')
         lobby.join(g.player)
         db.session.add(lobby)
         db.session.commit()

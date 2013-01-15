@@ -59,13 +59,12 @@ class LobbyListingAPI(MethodView):
         o_id = request.form['owner_id']
         name = request.form['name']
         server_address = request.form['server_address']
-        rcon_password = request.form['rcon_password']
         game_map = request.form['game_map']
         password = request.form['password']
         o = Player.query.get(o_id)
         if not o:
             abort(405)
-        l = Lobby(name, o, server_address, rcon_password, game_map, password)
+        l = Lobby(name, o, server_address, game_map, password)
         db.session.add(l)
         db.session.commit()
         return jsonify(201, id=l.id)

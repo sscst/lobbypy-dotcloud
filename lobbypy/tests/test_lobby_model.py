@@ -16,12 +16,12 @@ class LobbyModelTest(TestCase):
         db.drop_all()
 
     def _makeOne(self, owner=None, name='Lobby', server_address='server:9999',
-            game_map='cp_lololol', rcon_password='pass', password='password'):
+            game_map='cp_lololol', password='password'):
         from lobbypy.models import Lobby
         if owner is None:
             from lobbypy.models import Player
             owner = Player('-1')
-        return Lobby(name, owner, server_address, rcon_password, game_map, password)
+        return Lobby(name, owner, server_address, game_map, password)
 
     def test_player_count(self):
         instance = self._makeOne()

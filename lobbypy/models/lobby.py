@@ -17,17 +17,15 @@ class Lobby(db.Model):
     spectators = db.relationship('Player', secondary=spectator_table)
     lock = db.Column(db.Boolean, nullable=False, default=False)
     server_address = db.Column(db.String, nullable=False, unique=True)
-    rcon_password = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
     game_map = db.Column(db.String, nullable=False)
     __mapper_args__ = {'polymorphic_on': discriminator,
             'polymorphic_identity': 'generic'}
 
-    def __init__(self, name, owner, server_address, rcon_password, game_map, password):
+    def __init__(self, name, owner, server_address, game_map, password):
         self.name = name
         self.owner = owner
         self.server_address = server_address
-        self.rcon_password = rcon_password
         self.game_map = game_map
         self.password = password
 
