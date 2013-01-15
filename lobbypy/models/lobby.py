@@ -64,7 +64,7 @@ class Lobby(db.Model):
         else:
             for team in self.teams:
                 if player in team:
-                    return team.pop_player(player)
+                    return team._pop(player)
 
     def set_team(self, player, team_id):
         our_player = self._pop(player)
@@ -125,7 +125,7 @@ class Team(db.Model):
     def remove(self, lobby_player):
         self.players.remove(lobby_player)
 
-    def pop_player(self, player):
+    def _pop(self, player):
         lp = self.get_lobby_player(player)
         self.players.remove(lp)
         return lp

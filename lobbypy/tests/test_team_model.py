@@ -73,13 +73,13 @@ class TeamModelTest(TestCase):
         self.assertEqual(len(instance.players), 1)
         self.assertEqual(instance.players[0].player, p)
 
-    def test_pop_player(self):
+    def test_pop(self):
         instance = self._makeOne()
         from lobbypy.models import Player, LobbyPlayer
         p = Player('0')
         lp = LobbyPlayer(p)
         instance.players.append(lp)
-        rv = instance.pop_player(p)
+        rv = instance._pop(p)
         self.assertEqual(rv, lp)
         self.assertEqual(len(instance.players), 0)
 
