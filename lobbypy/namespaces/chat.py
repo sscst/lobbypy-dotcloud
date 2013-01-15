@@ -88,7 +88,7 @@ class ChatNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
             l_id = channel['dest']
             lobby = Lobby.query.get(l_id)
             if lobby:
-                return lobby.has_player(g.player)
+                return g.player in lobby
             return False
         return False
 

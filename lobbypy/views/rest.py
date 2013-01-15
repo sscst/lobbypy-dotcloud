@@ -59,13 +59,12 @@ class LobbyListingAPI(MethodView):
         o_id = request.form['owner_id']
         name = request.form['name']
         server_address = request.form['server_address']
-        rcon_password = request.form['rcon_password']
         game_map = request.form['game_map']
         password = request.form['password']
         o = Player.query.get(o_id)
         if not o:
             abort(405)
-        l = Lobby(name, o, server_address, rcon_password, game_map, password)
+        l = Lobby(name, o, server_address, game_map, password)
         db.session.add(l)
         db.session.commit()
         return jsonify(201, id=l.id)
@@ -78,7 +77,7 @@ class LobbyAPI(MethodView):
     @admin_check
     def put(self, lobby_id):
         l = Lobby.query.get(lobby_id)
-        if not l:
+        if l is None:
             abort(404)
         if 'owner_id' in request.form:
             o = Player.query.get(request.form['owner_id'])
@@ -94,12 +93,13 @@ class LobbyAPI(MethodView):
         if 'game_map' in request.form:
             l.game_map = request.form['game_map']
         db.session.commit()
+        print 'committed'
         return jsonify(200)
 
     @admin_check
     def delete(self, lobby_id):
         l = Lobby.query.get(lobby_id)
-        if not l:
+        if l is None:
             abort(404)
         db.session.delete(l)
         db.session.commit()
@@ -114,7 +114,7 @@ class SpectatorListingAPI(MethodView):
     @admin_check
     def post(self, lobby_id):
         l = Lobby.query.get(lobby_id)
-        if not l:
+        if l is None:
             abort(404)
         if 'player_id' not in request.form:
             abort(405)
@@ -137,7 +137,7 @@ class SpectatorAPI(MethodView):
     @admin_check
     def delete(self, lobby_id, player_id):
         l = Lobby.query.get(lobby_id)
-        if not l:
+        if l is None:
             abort(404)
         p = Player.query.get(player_id)
         if not p:
@@ -155,7 +155,7 @@ class TeamListingAPI(MethodView):
     @admin_check
     def post(self, lobby_id):
         l = Lobby.query.get(lobby_id)
-        if not l:
+        if l is None:
             abort(404)
         if 'name' not in request.form:
             abort(405)
@@ -174,7 +174,7 @@ class TeamAPI(MethodView):
     @admin_check
     def put(self, lobby_id, team_id):
         l = Lobby.query.get(lobby_id)
-        if not l:
+        if l is None:
             abort(404)
         if team_id >= len(l.teams):
             abort(404)
@@ -189,7 +189,7 @@ class TeamAPI(MethodView):
     @admin_check
     def delete(self, lobby_id, team_id):
         l = Lobby.query.get(lobby_id)
-        if not l:
+        if l is None:
             abort(404)
         if team_id >= len(l.teams):
             abort(404)
@@ -212,7 +212,7 @@ class LobbyPlayerListingAPI(MethodView):
     @admin_check
     def post(self, lobby_id, team_id):
         l = Lobby.query.get(lobby_id)
-        if not l:
+        if l is None:
             abort(404)
         if team_id >= len(l.teams):
             abort(404)
@@ -225,7 +225,7 @@ class LobbyPlayerListingAPI(MethodView):
         p = Player.query.get(p_id)
         if not p:
             abort(405)
-        t.append_player(p)
+        t.join(p)
         db.session.commit()
         return jsonify(201)
 
@@ -236,7 +236,7 @@ class LobbyPlayerAPI(MethodView):
             abort(404)
         team = lobby.teams[team_id]
         player = Player.query.get_or_404(player_id)
-        if not team.has_player(player):
+        if not player in team:
             abort(404)
         return jsonify(200,
                 lobby_player = make_lobby_player_dict(team.get_lobby_player(player)))
@@ -244,7 +244,7 @@ class LobbyPlayerAPI(MethodView):
     @admin_check
     def put(self, lobby_id, team_id, player_id):
         l = Lobby.query.get(lobby_id)
-        if not l:
+        if l is None:
             abort(404)
         if team_id >= len(l.teams):
             abort(404)
@@ -252,7 +252,7 @@ class LobbyPlayerAPI(MethodView):
             abort(404)
         t = l.teams[team_id]
         p = Player.query.get(player_id)
-        if not p or not t.has_player(p):
+        if not p or p not in t:
             abort(404)
         lp = t.get_lobby_player(p)
         if 'class_id' in request.form:
@@ -265,7 +265,7 @@ class LobbyPlayerAPI(MethodView):
     @admin_check
     def delete(self, lobby_id, team_id, player_id):
         l = Lobby.query.get(lobby_id)
-        if not l:
+        if l is None:
             abort(404)
         if team_id >= len(l.teams):
             abort(404)
@@ -273,8 +273,8 @@ class LobbyPlayerAPI(MethodView):
             abort(404)
         t = l.teams[team_id]
         p = Player.query.get(player_id)
-        if not p or not t.has_player(p):
+        if not p or p not in t:
             abort(404)
-        t.remove_player(p)
+        t.leave(p)
         db.session.commit()
         return jsonify(200)

@@ -1,5 +1,8 @@
 from .player import Player
-from .lobby import Lobby, Team, LobbyPlayer, spectator_table
+from .lobby import (
+        Lobby, Team, LobbyPlayer, spectator_table, HighlanderLobby,
+        SixesLobby, HighlanderTeam, SixesTeam
+        )
 from .utils import (
         make_lobby_item_dict, make_lobby_dict, make_player_dict,
         make_team_dict, make_lobby_player_dict

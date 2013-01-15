@@ -14,6 +14,12 @@ class Player(db.Model):
     def __init__(self, steam_id):
         self.steam_id = steam_id
 
+    def __eq__(self, other):
+        return isinstance(other, Player) and self.id == other.id
+
+    def __ne__(self, other):
+        return not isinstance(other, Player) and self.id != other.id
+
     @staticmethod
     def get_or_create(steam_id):
         rv = Player.query.filter_by(steam_id=steam_id).first()

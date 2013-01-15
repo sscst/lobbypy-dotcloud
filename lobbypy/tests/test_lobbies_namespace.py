@@ -85,8 +85,8 @@ class LobbiesNamespaceTest(TestCase):
         from lobbypy.models import Lobby, Player
         p = Player('0')
         lobbies = [
-                Lobby('A', p, '', '', '', ''),
-                Lobby('B', p, '', '', '', ''),
+                Lobby('A', p, '', '', '', teams=[]),
+                Lobby('B', p, '', '', '', teams=[]),
                 ]
         magic_Lobby.query.all.return_value = lobbies
         lobbies_dict = [

@@ -34,6 +34,14 @@ class LobbyNamespaceTest(TestCase):
         ns.spawn = MagicMock()
         return ns
 
+    def _makeLobby(self, owner=None, name='Lobby', server_address='server:9999',
+            game_map='cp_lololol', password='password'):
+        from lobbypy.models import Lobby
+        if owner is None:
+            from lobbypy.models import Player
+            owner = Player('-1')
+        return Lobby(name, owner, server_address, game_map, password, teams=[])
+
     def _makeRedisMessage(self, data_type, **data):
         data['type'] = data_type
         return {
@@ -78,7 +86,7 @@ class LobbyNamespaceTest(TestCase):
         instance = self._makeOne()
         o = Player('0')
         p = Player('1')
-        l = Lobby('', o, '', '', '', '')
+        l = self._makeLobby(owner=o)
         db.session.add(o)
         db.session.add(l)
         db.session.add(p)
@@ -100,7 +108,7 @@ class LobbyNamespaceTest(TestCase):
     def test_on_leave(self, magic_make, magic_item_make, magic_broadcast):
         instance = self._makeOne()
         o = Player('')
-        l = Lobby('', o, '', '', '', '')
+        l = self._makeLobby(owner=o) 
         p = Player('0')
         l.join(p)
         db.session.add(o)
@@ -124,7 +132,7 @@ class LobbyNamespaceTest(TestCase):
     def test_on_set_team(self, magic_make, magic_item_make, magic_broadcast):
         instance = self._makeOne()
         o = Player('')
-        l = Lobby('', o, '', '', '', '')
+        l = self._makeLobby(owner=o)
         t = Team('Red')
         l.teams.append(t)
         p = Player('0')
@@ -149,11 +157,11 @@ class LobbyNamespaceTest(TestCase):
     def test_on_set_class(self, magic_make, magic_item_make, magic_broadcast):
         instance = self._makeOne()
         o = Player('')
-        l = Lobby('', o, '', '', '', '')
+        l = self._makeLobby(owner=o)
         t = Team('Red')
         l.teams.append(t)
         p = Player('0')
-        t.append_player(p)
+        t.join(p)
         db.session.add(o)
         db.session.add(l)
         db.session.add(t)
@@ -173,11 +181,11 @@ class LobbyNamespaceTest(TestCase):
     def test_on_toggle_ready(self, magic_make, magic_broadcast):
         instance = self._makeOne()
         o = Player('')
-        l = Lobby('', o, '', '', '', '')
+        l = self._makeLobby(owner=o)
         t = Team('Red')
         l.teams.append(t)
         p = Player('0')
-        t.append_player(p)
+        t.join(p)
         db.session.add(o)
         db.session.add(l)
         db.session.add(t)
@@ -201,11 +209,11 @@ class LobbyNamespaceTest(TestCase):
     def test_on_kick(self, magic_make, magic_item_make, magic_broadcast):
         instance = self._makeOne()
         o = Player('')
-        l = Lobby('', o, '', '', '', '')
+        l = self._makeLobby(owner=o)
         t = Team('Red')
         l.teams.append(t)
         p = Player('0')
-        t.append_player(p)
+        t.join(p)
         db.session.add(o)
         db.session.add(l)
         db.session.add(t)
@@ -223,11 +231,11 @@ class LobbyNamespaceTest(TestCase):
     def test_on_set_team_name(self, magic_make, magic_item_make, magic_broadcast):
         instance = self._makeOne()
         o = Player('')
-        l = Lobby('', o, '', '', '', '')
+        l = self._makeLobby(owner=o)
         t = Team('Red')
         l.teams.append(t)
         p = Player('0')
-        t.append_player(p)
+        t.join(p)
         db.session.add(o)
         db.session.add(l)
         db.session.add(t)
@@ -245,11 +253,11 @@ class LobbyNamespaceTest(TestCase):
     def test_on_set_lobby_name(self, magic_make, magic_item_make, magic_broadcast):
         instance = self._makeOne()
         o = Player('')
-        l = Lobby('', o, '', '', '', '')
+        l = self._makeLobby(owner=o)
         t = Team('Red')
         l.teams.append(t)
         p = Player('0')
-        t.append_player(p)
+        t.join(p)
         db.session.add(o)
         db.session.add(l)
         db.session.add(t)
