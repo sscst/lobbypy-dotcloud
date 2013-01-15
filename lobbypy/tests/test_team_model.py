@@ -41,6 +41,16 @@ class TeamModelTest(TestCase):
         p = Player('0')
         self.assertTrue(not p in instance)
 
+    def test_can_join(self):
+        instance = self._makeOne()
+        self.assertTrue(instance.can_join())
+
+    def test_can_set_class(self):
+        instance = self._makeOne()
+        self.assertTrue(instance.can_set_class(None))
+        self.assertTrue(instance.can_set_class(0))
+        self.assertTrue(not instance.can_set_class(10))
+
     def test_get_lobby_player(self):
         instance = self._makeOne()
         from lobbypy.models import Player, LobbyPlayer

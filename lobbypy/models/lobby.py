@@ -127,11 +127,22 @@ class Team(db.Model):
     def __contains__(self, player):
         return any([lp.player == player for lp in self.players])
 
+    def can_join(self):
+        return True
+
+    def can_set_class(self, class_id):
+        return class_id is None or class_id >= 0 and class_id < 9
+
+    def class_count(self, class_id):
+        return len([lp for lp in self.players
+            if lp.class_id == class_id])
+
     def get_lobby_player(self, player):
         lps = [lp for lp in self.players if lp.player == player]
         return lps.pop()
 
     def append(self, lobby_player):
+        assert lobby_player.player not in self
         self.players.append(lobby_player)
 
     def remove(self, lobby_player):
@@ -144,6 +155,7 @@ class Team(db.Model):
 
     def join(self, player):
         assert player not in self
+        assert self.can_join()
         self.append(LobbyPlayer(player))
 
     def leave(self, player):
@@ -151,6 +163,7 @@ class Team(db.Model):
         self.remove(lp)
 
     def set_class(self, player, class_id):
+        assert self.can_set_class(class_id)
         lp = self.get_lobby_player(player)
         lp.class_id = class_id
 
@@ -161,8 +174,32 @@ class Team(db.Model):
 class HighlanderTeam(Team):
     __mapper_args__ = {'polymorphic_identity': 'highlander'}
 
+    def can_join(self):
+        return len(self) < 9
+
+    def can_set_class(self, class_id):
+        return (super(HighlanderTeam, self).can_set_class(class_id)
+                and (class_id is None or class_id not in
+                    [lp.class_id for lp in self.players]))
+
 class SixesTeam(Team):
     __mapper_args__ = {'polymorphic_identity': 'sixes'}
+
+    def can_join(self):
+        return len(self) < 6
+
+    def can_set_class(self, class_id):
+        return (super(SixesTeam, self).can_set_class(class_id)
+                and self._can_set_class(class_id))
+
+    def _can_set_class(self, class_id):
+        if class_id == 0 or class_id == 1:
+            return self.class_count(class_id) < 2
+        elif class_id == 3 or class_id == 6:
+            return self.class_count(class_id) < 1
+        elif class_id is None:
+            return True
+        return False
 
 class LobbyPlayer(db.Model):
     __tablename__ = 'lobby_player'
