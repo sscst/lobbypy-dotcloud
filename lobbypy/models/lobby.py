@@ -19,8 +19,7 @@ class Lobby(db.Model):
     server_address = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
     game_map = db.Column(db.String, nullable=False)
-    __mapper_args__ = {'polymorphic_on': discriminator,
-            'polymorphic_identity': 'generic'}
+    __mapper_args__ = {'polymorphic_on': discriminator}
 
     def __init__(self, name, owner, server_address, game_map, password,
             teams=None):
@@ -115,8 +114,7 @@ class Team(db.Model):
     lobby_id = db.Column(db.Integer, db.ForeignKey('lobby.id'), nullable=False)
     players = db.relationship('LobbyPlayer', backref='team',
             cascade='save-update,merge,delete,delete-orphan')
-    __mapper_args__ = {'polymorphic_on': discriminator,
-            'polymorphic_identity': 'generic'}
+    __mapper_args__ = {'polymorphic_on': discriminator}
 
     def __init__(self, name):
         self.name = name

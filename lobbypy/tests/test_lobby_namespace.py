@@ -72,7 +72,8 @@ class LobbyNamespaceTest(TestCase):
         instance.recv_connect()
         magic_check_map.return_value = True
         magic_check_players.return_value = True
-        rvs = instance.on_create_lobby('test', 'test', 'test', 'test')
+        rvs = instance.on_create_lobby('test', 'test', 'test', 'test',
+            'highlander')
         lobby = Lobby.query.first()
         print lobby
         self.assertTrue(rvs[0])
