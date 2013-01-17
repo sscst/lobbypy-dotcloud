@@ -21,7 +21,8 @@ def run(debug, rcon_check):
     sys.stderr.write('PORT: %d\n' % port)
     sys.stderr.write(title + '\n')
     config_app(app, DEBUG=debug, RCON_CHECK_SERVER=(not rcon_check))
-    SocketIOServer(('', port), app, resource="socket.io").serve_forever()
+    SocketIOServer(('', port), app, resource="socket.io", transports=lambda:
+            ['websocket', 'xhr-polling']).serve_forever()
 
 @manager.command
 def init_db():
