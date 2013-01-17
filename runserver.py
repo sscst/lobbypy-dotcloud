@@ -8,8 +8,6 @@ from lobbypy import create_app, config_app
 
 app = create_app()
 manager = Manager(app)
-# Bind to PORT if defined, otherwise default to 5000.
-port = int(os.environ.get('PORT', 5000))
 
 @manager.option('--no-rcon-check', dest='rcon_check', action='store_const',
         const=True, default=False)
@@ -18,6 +16,9 @@ def run(debug, rcon_check):
     from random import randint
     from asciiart import images, title
     sys.stderr.write(images[randint(0, len(images) - 1)] + '\n')
+    # Bind to PORT if defined, otherwise default to 5000.
+    port = int(os.environ.get('PORT', 5000))
+    sys.stderr.write('PORT: %d\n' % port)
     sys.stderr.write(title + '\n')
     config_app(app, DEBUG=debug, RCON_CHECK_SERVER=(not rcon_check))
     SocketIOServer(('', port), app, resource="socket.io").serve_forever()
