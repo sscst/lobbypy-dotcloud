@@ -14,7 +14,7 @@ table {
 	margin-top: 9px;
 }
 
-/* app container (for backbone)*/
+/* app container (for backbone) */
 #app-container {
 	min-height: 740px;
 	padding: 0px 0px 0px 0px;
@@ -134,7 +134,7 @@ ul#lobbylist {
 .lobbytable .bluh {
 	text-align: center;
 	font-size: x-large;
-	font-family: Arial;
+	font-family: "Arial";
 	vertical-align: text-top;
 	color: white;
 	padding: 5px;

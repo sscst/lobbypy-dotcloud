@@ -15,7 +15,7 @@
               <span class="players">{{player_count}} / {{max_players}}</span>
             </li>
           </a>
-          {{/#each}}
+          {{/each}}
         </ul>
       </div>
       % if g.player:
@@ -55,7 +55,7 @@
           <tr>
             {{#each teams}}
             <th class="{{name}}h" id="team-{{id}}">{{name}}</th>
-            {{/#each}}
+            {{/each}}
           </tr>
         </thead>
         <tbody>
@@ -70,7 +70,7 @@
                   <img class="classicon" src="/static/images/{{class_id}}.png" alt="?" />
                   <div class="clearfix"></div>
                 </li>
-                {{/#each}}
+                {{/each}}
               </ul>
             </td>
             <td>
@@ -83,7 +83,7 @@
                   <img class="classicon" src="/static/images/{{class_id}}.png" alt="?" />
                   <div class="clearfix"></div>
                 </li>
-                {{/#each}}
+                {{/each}}
               </ul>
             </td>
           </tr>
@@ -98,7 +98,7 @@
                 <li>
                   {{#each spectators}}
                   <div class="name"></div>
-                  {{/#each}}
+                  {{/each}}
                 </li>
               </ul>
             </div>
