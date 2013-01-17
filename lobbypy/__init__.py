@@ -1,4 +1,5 @@
 import os
+import logging
 from datetime import timedelta
 from socketio.server import SocketIOServer
 from flask import Flask
@@ -25,6 +26,15 @@ def config_app(app, **config):
     ADMIN_URL = config.get('ADMIN_URL', 'admin')
     app.config['ADMIN_AUTH_TIMEOUT'] = config.get('ADMIN_AUTH_TIMEOUT',
             timedelta(hours=1))
+
+    if not app.debug and not app.config['TESTING']:
+        stderr_handler = logging.StreamHandler()
+        stderr_handler.setFormatter(logging.Formatter(
+            '%(asctime)s - [%(levelname)s]: %(message)s '
+            '[%(pathname)s:%(lineno)d]'))
+        for logger in [app.logger]:
+            logger.addHandler(stderr_handler)
+        app.logger.setLevel(logging.INFO)
 
     mako.init_app(app)
     db.init_app(app)
@@ -67,3 +77,5 @@ def config_app(app, **config):
     app.add_url_rule(('/admin/rest/lobbies/<int:lobby_id>'
         '/teams/<int:team_id>/players/<int:player_id>'),
         view_func=views.LobbyPlayerAPI.as_view('lobby_player'))
+
+    app.logger.info('LobbyPy successfully configured. Dispensing product.')
