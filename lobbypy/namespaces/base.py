@@ -1,7 +1,7 @@
 from socketio.namespace import BaseNamespace as Namespace
 import redis
 from json import dumps, loads
-from flask import current_app
+from flask import current_app, g
 
 class BaseNamespace(Namespace):
     def __init__(self, *args, **kwargs):
@@ -40,11 +40,17 @@ class RedisListenerMixin(object):
             self.spawn(self.listener)
         else:
             self.pubsub.subscribe(ns)
+        current_app.logger.debug(
+                'Player: %s subscribing to namespace: %s' % (
+                    g.player.id if g.player else 'Anonymous', ns))
 
     def unsubscribe(self, ns):
         self.pubsub.unsubscribe(ns)
 
     def listener(self):
+        current_app.logger.debug(
+                'Player: %s spawning listener' % (g.player.id if
+                    g.player else 'Anonymous'))
         self.ctx.push()
         for m in self.pubsub.listen():
             if m['type'] == 'message':

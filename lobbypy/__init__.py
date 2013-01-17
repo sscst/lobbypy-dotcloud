@@ -67,3 +67,5 @@ def config_app(app, **config):
     app.add_url_rule(('/admin/rest/lobbies/<int:lobby_id>'
         '/teams/<int:team_id>/players/<int:player_id>'),
         view_func=views.LobbyPlayerAPI.as_view('lobby_player'))
+
+    app.logger.info('LobbyPy successfully configured. Dispensing product.')

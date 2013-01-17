@@ -12,6 +12,7 @@ from lobbypy.utils import db
 from .utils import admin_check, jsonify
 
 class PlayerListingAPI(MethodView):
+    @admin_check
     def get(self):
         players = Player.query.all()
         player_dicts = [make_player_dict(p) for p in players]
@@ -25,6 +26,7 @@ class PlayerListingAPI(MethodView):
         return jsonify(201, id=p.id)
 
 class PlayerAPI(MethodView):
+    @admin_check
     def get(self, player_id):
         player = Player.query.get_or_404(player_id)
         return jsonify(200, player = make_player_dict(player))
@@ -49,6 +51,7 @@ class PlayerAPI(MethodView):
         return jsonify(200)
 
 class LobbyListingAPI(MethodView):
+    @admin_check
     def get(self):
         lobbies = Lobby.query.all()
         lobby_dicts = [make_lobby_dict(l) for l in lobbies]
@@ -70,6 +73,7 @@ class LobbyListingAPI(MethodView):
         return jsonify(201, id=l.id)
 
 class LobbyAPI(MethodView):
+    @admin_check
     def get(self, lobby_id):
         lobby = Lobby.query.get_or_404(lobby_id)
         return jsonify(200, lobby = make_lobby_dict(lobby))
@@ -106,6 +110,7 @@ class LobbyAPI(MethodView):
         return jsonify(200)
 
 class SpectatorListingAPI(MethodView):
+    @admin_check
     def get(self, lobby_id):
         lobby = Lobby.query.get_or_404(lobby_id)
         player_dicts = [make_player_dict(p) for p in lobby.spectators]
@@ -127,6 +132,7 @@ class SpectatorListingAPI(MethodView):
         return jsonify(200)
 
 class SpectatorAPI(MethodView):
+    @admin_check
     def get(self, lobby_id, player_id):
         lobby = Lobby.query.get_or_404(lobby_id)
         player = Player.query.get_or_404(player_id)
@@ -147,6 +153,7 @@ class SpectatorAPI(MethodView):
         return jsonify(200)
 
 class TeamListingAPI(MethodView):
+    @admin_check
     def get(self, lobby_id):
         lobby = Lobby.query.get_or_404(lobby_id)
         team_dicts = [make_team_dict(i, t) for i, t in enumerate(lobby.teams)]
@@ -165,6 +172,7 @@ class TeamListingAPI(MethodView):
         return jsonify(201, id=len(l.teams) - 1)
 
 class TeamAPI(MethodView):
+    @admin_check
     def get(self, lobby_id, team_id):
         lobby = Lobby.query.get_or_404(lobby_id)
         if team_id >= len(lobby.teams) or team_id < 0:
@@ -201,6 +209,7 @@ class TeamAPI(MethodView):
         return jsonify(200)
 
 class LobbyPlayerListingAPI(MethodView):
+    @admin_check
     def get(self, lobby_id, team_id):
         lobby = Lobby.query.get_or_404(lobby_id)
         if team_id >= len(lobby.teams) or team_id < 0:
@@ -230,6 +239,7 @@ class LobbyPlayerListingAPI(MethodView):
         return jsonify(201)
 
 class LobbyPlayerAPI(MethodView):
+    @admin_check
     def get(self, lobby_id, team_id, player_id):
         lobby = Lobby.query.get_or_404(lobby_id)
         if team_id >= len(lobby.teams) or team_id < 0:

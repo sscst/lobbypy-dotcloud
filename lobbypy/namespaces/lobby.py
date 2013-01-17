@@ -194,7 +194,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         # Set lobby id and start listening on redis
         self.lobby_id = lobby.id
         self.subscribe('/lobby/%d' % lobby.id)
-        current_app.logger.info('Player %d created Lobby %d' % (g.player.id,
+        current_app.logger.info('Player: %d created Lobby %d' % (g.player.id,
             lobby.id))
         return True, lobby.id
 
@@ -215,7 +215,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         else:
             self.del_acl_method('on_set_class')
             self.del_acl_method('on_toggle_ready')
-        current_app.logger.info('Player %d set team to %s', (g.player.id,
+        current_app.logger.info('Player: %d set team to %s', (g.player.id,
             team_id if team_id else 'Spectator'))
         return True
 
@@ -229,7 +229,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         # Broadcast redis update
         self.broadcast_event('/lobby/', 'update', make_lobby_item_dict(lobby))
         self.broadcast_event('/lobby/%d', 'update', make_lobby_dict(lobby))
-        current_app.logger.info('Player %d set class to %s', (g.player.id,
+        current_app.logger.info('Player: %d set class to %s', (g.player.id,
             class_id if class_id else 'Random'))
         return True
 
@@ -249,7 +249,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         else:
             self.del_acl_method('on_set_class')
             self.del_acl_method('on_set_team')
-        current_app.logger.info('Player %d toggled ready to %s', (g.player.id,
+        current_app.logger.info('Player: %d toggled ready to %s', (g.player.id,
             lobby.is_ready_player(g.player)))
         return True
 
@@ -274,6 +274,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
                 make_lobby_item_dict(lobby))
         self.broadcast_event('/lobby/%d', 'update',
                 make_lobby_dict(lobby))
+        current_app.logger.info('Player: %d kicked Player: %d from Lobby: %d' %
+                (g.player.id, player_id, self.lobby_id))
         return True
 
     def on_ban(self, player_id):
@@ -295,6 +297,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         db.session.commit()
         self.broadcast_event('/lobby/%d', 'update',
                 make_lobby_dict(lobby))
+        current_app.logger.info('Player: %d set Team: %d\'s name to `%s` on Lobby: %d' %
+                (g.player.id, team_id, name, self.lobby_id))
         return True
 
     def on_set_lobby_name(self, name):
@@ -310,6 +314,9 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
                 make_lobby_item_dict(lobby))
         self.broadcast_event('/lobby/%d', 'update',
                 make_lobby_dict(lobby))
+        current_app.logger.info('Player: %d set Lobby: %d\'s name to `%s`' %
+                (g.player.id, self.lobby_id, name))
+        return True
 
     def on_give_owner(self):
         pass

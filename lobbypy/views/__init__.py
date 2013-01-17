@@ -52,7 +52,7 @@ def create_or_login(resp):
     db.session.commit()
     session['user_id'] = g.player.id
     flash('You are logged in as %s' % g.player.steam_id)
-    current_app.logger.info('Player %d logged in' % g.player.id)
+    current_app.logger.info('Player: %d logged in' % g.player.id)
     return redirect(oid.get_next_url())
 
 def before_request():
@@ -71,7 +71,7 @@ def before_request():
 def logout():
     session.pop('user_id', None)
     session.pop('auth_time', None)
-    current_app.logger.info('Player %d logged out' % g.player.id)
+    current_app.logger.info('Player: %d logged out' % g.player.id)
     return redirect(oid.get_next_url())
 
 @admin_check
@@ -82,6 +82,7 @@ def admin():
             return render_template('admin_login.mako', **{
                 'bad_pass': True
             })
+        current_app.logger.info('Player: %d logged in as admin' % g.player.id)
         session['auth_time'] = datetime.now()
         return redirect(url_for('admin'))
     if not g.admin_authed:
@@ -99,4 +100,6 @@ def run_socketio(path):
             '/chat': ChatNamespace,
         },
         request=(real_app, real_request))
+    current_app.logger.debug('Player: %s opened socket' % (g.player.id if
+        g.player else 'Anonymous'))
     return Response()
