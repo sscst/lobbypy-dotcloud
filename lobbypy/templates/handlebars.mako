@@ -97,7 +97,7 @@
               <ul id="specteamlist">
                 <li>
                   {{#each spectators}}
-                  <div class="name"></div>
+                  <div class="name">{{player.name}}</div>
                   {{/each}}
                 </li>
               </ul>
