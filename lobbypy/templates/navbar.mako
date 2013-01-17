@@ -17,7 +17,7 @@
             <li><a href="#"><i class="icon-legal"></i> Report Player</a></li>
           </ul>
         </li>
-        % if g.admin_authed:
+        % if g.player and g.player.admin:
         <li><a href="/admin"><i class="icon-cog"></i> Admin Dashboard</a></li>
         % endif
       </ul>
