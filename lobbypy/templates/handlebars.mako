@@ -89,10 +89,13 @@
           </tr>
           <tr>
             <td colspan="2">
-            {{#if spectators.length}}
             <div id="spectator-group">
               <div id="spectator-count">
-                Spectators ({{spectators.length}}):
+              {{#if spectators.length}}
+                Spectators ({{this.length}}):
+              {{else}}
+                No spectators.
+              {/if}}
               </div>
               <ul id="specteamlist">
                 <li>
@@ -102,7 +105,6 @@
                 </li>
               </ul>
             </div>
-            {{/if}}
             </td>
           </tr>
         </tbody>
