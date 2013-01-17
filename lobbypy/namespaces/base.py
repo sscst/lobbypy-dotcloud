@@ -48,10 +48,10 @@ class RedisListenerMixin(object):
         self.pubsub.unsubscribe(ns)
 
     def listener(self):
+        self.ctx.push()
         current_app.logger.debug(
                 'Player: %s spawning listener' % (g.player.id if
                     g.player else 'Anonymous'))
-        self.ctx.push()
         for m in self.pubsub.listen():
             if m['type'] == 'message':
                 data = loads(m['data'])
