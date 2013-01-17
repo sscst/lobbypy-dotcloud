@@ -2,6 +2,10 @@ body {
 	padding-top: 40px;
 }
 
+table {
+	background: transparent;
+}
+
 .icon-white {
 	color: #ffffff;
 }
@@ -25,7 +29,7 @@ ul#lobbylist {
 	margin: 0px 5px 0px 5px;
 }
 
-.lobbylist-box {
+#lobbylist-box {
 	height: 300px;
 	overflow: auto;
 	position: relative;
@@ -92,6 +96,8 @@ ul#lobbylist {
 
 .map-details {
 	text-align: left;
+	padding: 0px;
+	display: block;
 }
 
 .map-details .map-name {
@@ -102,23 +108,144 @@ ul#lobbylist {
 	border: 1px black solid;
 }
 
+/* class selection */
+
+#class-selection {
+	padding: 5px 0px 5px 0px;
+	margin-left: 23%;
+	margin-right: 23%;
+}
+
+.classicon {
+	position: relative;
+	width: 24px;
+	height:24px;
+}
 
 /* lobby players table */
 
 .lobbytable {
-	
+	margin-left: auto;
+	margin-right: auto;
+	width: 400px;
+}
+
+.lobbytable .redh,
+.lobbytable .bluh {
+	text-align: center;
+	font-size: x-large;
+	font-family: Arial;
+	vertical-align: text-top;
+	color: white;
+	padding: 5px;
+	width: 200px;
+	-webkit-font-smoothing: antialiased;
+	cursor: pointer;
 }
 
 .lobbytable .redh {
-	text-align: center;
-	vertical-align: text-top;
 	background-color: #c15143;
 }
 
 .lobbytable .bluh {
-	text-align: center;
-	vertical-align: text-top;
 	background-color: #80a1c2;
+}
+
+ul.teamplayerlist {
+	margin: 0px 0px 0px 0px;
+}
+
+ul.teamplayerlist li {
+	list-style: none;
+	display: block;
+	padding: 5px;
+	margin-bottom: 2px;
+	margin-top: 2px;
+	font-family: "Arial";
+	font-weight: bold;
+	font-size: 16px;
+	color: #ffffff;
+	height: 21px;
+	border: 1px #575757 solid;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;	
+	-webkit-font-smoothing: antialiased;
+}
+
+#bluteamlist .teamplayerlist .avatar {
+	float: left;
+}
+
+#bluteamlist .teamplayerlist .playerinfo {
+	float: left;
+}
+
+#bluteamlist .playerinfo .name {
+	float: left;
+	vertical-align: text-top;
+}
+
+#bluteamlist .classicon {
+	position: relative;
+	float: right;
+	top: -2px;
+	width: 24px;
+	height:24px;
+}
+
+#bluteamlist li {
+	background: rgb(30,87,153); /* Old browsers */
+	background: -moz-linear-gradient(left, rgba(30,87,153,1) 0%, rgba(30,87,153,1) 15%, rgba(128,161,194,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(30,87,153,1)), color-stop(15%,rgba(30,87,153,1)), color-stop(100%,rgba(128,161,194,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(left, rgba(30,87,153,1) 0%,rgba(30,87,153,1) 15%,rgba(128,161,194,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(left, rgba(30,87,153,1) 0%,rgba(30,87,153,1) 15%,rgba(128,161,194,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(left, rgba(30,87,153,1) 0%,rgba(30,87,153,1) 15%,rgba(128,161,194,1) 100%); /* IE10+ */
+	background: linear-gradient(to right, rgba(30,87,153,1) 0%,rgba(30,87,153,1) 15%,rgba(128,161,194,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1e5799', endColorstr='#80a1c2',GradientType=1 ); /* IE6-9 */
+}
+
+#redteamlist .teamplayerlist .avatar {
+	float: right;
+}
+
+#redteamlist .teamplayerlist .playerinfo {
+	float: right;
+}
+
+#redteamlist .playerinfo .name {
+	float: right;
+	vertical-align: text-top;
+}
+
+#redteamlist .classicon {
+	position: relative;
+	float: left;
+	top: -2px;
+	width: 24px;
+	height:24px;
+}
+
+#redteamlist li {
+	background: rgb(193,81,67); /* Old browsers */
+	background: -moz-linear-gradient(left, rgba(193,81,67,1) 0%, rgba(170,47,47,1) 85%, rgba(170,47,47,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(193,81,67,1)), color-stop(85%,rgba(170,47,47,1)), color-stop(100%,rgba(170,47,47,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(left, rgba(193,81,67,1) 0%,rgba(170,47,47,1) 85%,rgba(170,47,47,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(left, rgba(193,81,67,1) 0%,rgba(170,47,47,1) 85%,rgba(170,47,47,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(left, rgba(193,81,67,1) 0%,rgba(170,47,47,1) 85%,rgba(170,47,47,1) 100%); /* IE10+ */
+	background: linear-gradient(to right, rgba(193,81,67,1) 0%,rgba(170,47,47,1) 85%,rgba(170,47,47,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c15143', endColorstr='#aa2f2f',GradientType=1 ); /* IE6-9 */
+}
+ul#specteamlist li {
+	list-style: none;
+	display: block;
+	margin: 0px;
+}
+
+#specteamlist .name {
+	float: left;
+	vertical-align: text-top;
+	margin-right: 5px;
 }
 
 /* admin */
@@ -180,6 +307,10 @@ ul.admin-lobbyplayers {
 .admin-red-player,
 .admin-blu-player {
 
+}
+
+.lpt-label {
+	display: inline;
 }
 
 /* bootstrap */
@@ -347,10 +478,14 @@ i {
 
 .row-white td,
 .row-white th {
-	vertical-align:text-top;
+	vertical-align:top;
 }
 
 /* reduce margin to improve dropdowns */
 .nav-tabs .dropdown-menu, .nav-pills .dropdown-menu, .navbar .dropdown-menu {
-    margin-top: 0;
+	margin-top: 0;
+}
+
+input[type="checkbox"]{
+	margin: -1px 2px 0px 0px;
 }
