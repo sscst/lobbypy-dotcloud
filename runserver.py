@@ -19,7 +19,7 @@ def run(debug, rcon_check):
     from asciiart import images, title
     sys.stderr.write(images[randint(0, len(images) - 1)] + '\n')
     sys.stderr.write(title + '\n')
-    config_app(app, DEBUG=debug, RCON_CHECK_SERVER=not rcon_check)
+    config_app(app, DEBUG=debug, RCON_CHECK_SERVER=(not rcon_check))
     SocketIOServer(('', port), app, resource="socket.io").serve_forever()
 
 @manager.command
