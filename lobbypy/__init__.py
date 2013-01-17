@@ -1,4 +1,5 @@
 import os
+import urlparse
 import logging
 from datetime import timedelta
 from socketio.server import SocketIOServer
@@ -13,7 +14,10 @@ def config_app(app, **config):
             or os.environ['SESSION_KEY'])
     app.config['SQLALCHEMY_DATABASE_URI'] = (
             config.get('SQLALCHEMY_DATABASE_URI', None)
+            or os.environ.get('HEROKU_POSTGRESQL_BLUE_URL', None)
             or os.environ['SQLALCHEMY_DATABASE_URI'])
+    app.config['REDIS_URL'] = urlparse.urlparse(os.environ.get('REDISTOGO_URL',
+        'redis://localhost'))
     app.debug = config.get('DEBUG', False)
     app.config['TESTING'] = config.get('TESTING', False)
     app.config['RCON_CHECK_SERVER'] = config.get('RCON_CHECK_SERVER', True)
