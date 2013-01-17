@@ -1,6 +1,6 @@
 from flask import g, current_app
 from srcdspy.rcon import RconException
-from lobbypy.models import Lobby, Player, make_lobby_item_dict, make_lobby_dict
+from lobbypy.models import Lobby, Player, HighlanderLobby, SixesLobby, make_lobby_item_dict, make_lobby_dict
 from lobbypy.utils import db
 from lobbypy.controllers import leave_or_delete_all_lobbies
 from lobbypy.lib.srcds_api import connect_rcon, connect_query, check_map, check_players
@@ -145,7 +145,8 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         return True
 
     # PLAYER ONLY METHODS
-    def on_create_lobby(self, name, server_address, rcon_password, game_map):
+    def on_create_lobby(self, name, server_address, rcon_password, game_map,
+            game_type):
         """Create and join lobby"""
         assert g.player
         assert not self.lobby_id
@@ -155,9 +156,9 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
                 sr = connect_rcon(server_address, rcon_password)
                 sq = connect_query(server_address)
             except RconException:
-                return False, 'bad_pass'
+                return False, 'bad_rcon_pass'
             except Exception:
-                return False, 'server_issue'
+                return False, 'server_error'
             else:
                 if not check_map(sr):
                     return False, 'map_dne'
@@ -169,7 +170,12 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         # Leave or delete old lobbies
         lobby_deletes = leave_or_delete_all_lobbies(g.player)
         # TODO: pull/generate password from list
-        lobby = Lobby(name, g.player, server_address, rcon_password, game_map, 'password')
+        if game_type == 'highlander':
+            lobby = HighlanderLobby(name, g.player, server_address, game_map, 'password')
+        elif game_type == 'sixes':
+            lobby = SixesLobby(name, g.player, server_address, game_map, 'password')
+        else:
+            return False, 'bad_game_type'
         lobby.join(g.player)
         db.session.add(lobby)
         db.session.commit()
@@ -260,7 +266,7 @@ class LobbyNamespace(BaseNamespace, RedisListenerMixin, RedisBroadcastMixin):
         player = Player.query.get(player_id)
         if player is None:
             return False, 'player_dne'
-        if not lobby.has_player(player):
+        if not player in lobby:
             return False, 'player_dne_lobby'
         lobby.leave(player)
         db.session.commit()

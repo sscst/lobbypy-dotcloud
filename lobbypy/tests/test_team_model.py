@@ -27,19 +27,29 @@ class TeamModelTest(TestCase):
         instance.players.append(lp)
         self.assertEqual(len(instance), 1)
 
-    def test_has_player(self):
+    def test_contains(self):
         instance = self._makeOne()
         from lobbypy.models import Player, LobbyPlayer
         p = Player('0')
         lp = LobbyPlayer(p)
         instance.players.append(lp)
-        self.assertTrue(instance.has_player(p))
+        self.assertTrue(p in instance)
 
-    def test_not_has_player(self):
+    def test_not_contains(self):
         instance = self._makeOne()
         from lobbypy.models import Player
         p = Player('0')
-        self.assertTrue(not instance.has_player(p))
+        self.assertTrue(not p in instance)
+
+    def test_can_join(self):
+        instance = self._makeOne()
+        self.assertTrue(instance.can_join())
+
+    def test_can_set_class(self):
+        instance = self._makeOne()
+        self.assertTrue(instance.can_set_class(None))
+        self.assertTrue(instance.can_set_class(0))
+        self.assertTrue(not instance.can_set_class(10))
 
     def test_get_lobby_player(self):
         instance = self._makeOne()
@@ -65,31 +75,31 @@ class TeamModelTest(TestCase):
         self.assertEqual(len(instance.players), 1)
         self.assertEqual(instance.players[0], lp)
 
-    def test_append_player(self):
+    def test_join(self):
         instance = self._makeOne()
         from lobbypy.models import Player
         p = Player('0')
-        instance.append_player(p)
+        instance.join(p)
         self.assertEqual(len(instance.players), 1)
         self.assertEqual(instance.players[0].player, p)
 
-    def test_pop_player(self):
+    def test_pop(self):
         instance = self._makeOne()
         from lobbypy.models import Player, LobbyPlayer
         p = Player('0')
         lp = LobbyPlayer(p)
         instance.players.append(lp)
-        rv = instance.pop_player(p)
+        rv = instance._pop(p)
         self.assertEqual(rv, lp)
         self.assertEqual(len(instance.players), 0)
 
-    def test_remove_player(self):
+    def test_leave(self):
         instance = self._makeOne()
         from lobbypy.models import Player, LobbyPlayer
         p = Player('0')
         lp = LobbyPlayer(p)
         instance.players.append(lp)
-        instance.remove_player(p)
+        instance.leave(p)
         self.assertEqual(len(instance.players), 0)
 
     def test_set_class(self):

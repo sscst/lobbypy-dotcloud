@@ -22,6 +22,14 @@ class RestTest(TestCase):
         with self.client.session_transaction() as sess:
             sess['user_id'] = a.id
 
+    def _makeLobby(self, name='test', owner=None, server_address='test',
+            game_map='test', password='test', teams=lambda: []):
+        from lobbypy.models import Lobby
+        if owner is None:
+            from lobbypy.models import Player
+            owner = Player('')
+        return Lobby(name, owner, server_address, game_map, password, teams)
+
     def tearDown(self):
         db.session.remove()
         db.drop_all()
@@ -51,8 +59,8 @@ class RestTest(TestCase):
     @patch('lobbypy.models.player.get_player_summary_for_steam_id')
     def test_get_lobby_listing(self, magic_get_summary):
         p = Player('0')
-        db.session.add(Lobby('A', self.admin, 'a', '', '', ''))
-        db.session.add(Lobby('B', p, 'b', '', '', ''))
+        db.session.add(self._makeLobby('A', self.admin, 'a', '', ''))
+        db.session.add(self._makeLobby('B', p, 'b', '', ''))
         db.session.commit()
         magic_get_summary.return_value = {'personaname':'Anonymous'}
         resp = self.client.get('/admin/rest/lobbies')
@@ -62,7 +70,7 @@ class RestTest(TestCase):
 
     @patch('lobbypy.models.player.get_player_summary_for_steam_id')
     def test_get_lobby(self, magic_get_summary):
-        l = Lobby('A', self.admin, '', '', '', '')
+        l = self._makeLobby('A', self.admin, '', '', '')
         db.session.add(l)
         db.session.commit()
         magic_get_summary.return_value = {'personaname':'Anonymous'}
@@ -77,7 +85,7 @@ class RestTest(TestCase):
 
     @patch('lobbypy.models.player.get_player_summary_for_steam_id')
     def test_get_spectator_listing(self, magic_get_summary):
-        l = Lobby('A', self.admin, '', '', '', '')
+        l = self._makeLobby('A', self.admin, '', '', '')
         p = Player('0')
         l.spectators.append(self.admin)
         l.spectators.append(p)
@@ -91,7 +99,7 @@ class RestTest(TestCase):
 
     @patch('lobbypy.models.player.get_player_summary_for_steam_id')
     def test_get_spectator(self, magic_get_summary):
-        l = Lobby('A', self.admin, '', '', '', '')
+        l = self._makeLobby('A', self.admin, '', '', '')
         l.spectators.append(self.admin)
         db.session.add(l)
         db.session.commit()
@@ -106,7 +114,7 @@ class RestTest(TestCase):
 
     @patch('lobbypy.models.player.get_player_summary_for_steam_id')
     def test_get_team_listing(self, magic_get_summary):
-        l = Lobby('A', self.admin, '', '', '', '')
+        l = self._makeLobby('A', self.admin, '', '', '')
         l.teams.append(Team('Red'))
         l.teams.append(Team('Blu'))
         db.session.add(l)
@@ -119,7 +127,7 @@ class RestTest(TestCase):
 
     @patch('lobbypy.models.player.get_player_summary_for_steam_id')
     def test_get_team(self, magic_get_summary):
-        l = Lobby('A', self.admin, '', '', '', '')
+        l = self._makeLobby('A', self.admin, '', '', '')
         l.teams.append(Team('Red'))
         db.session.add(l)
         db.session.commit()
@@ -132,11 +140,11 @@ class RestTest(TestCase):
 
     @patch('lobbypy.models.player.get_player_summary_for_steam_id')
     def test_get_lobby_player_listing(self, magic_get_summary):
-        l = Lobby('A', self.admin, '', '', '', '')
+        l = self._makeLobby('A', self.admin, '', '', '')
         t = Team('Red')
         p = Player('0')
-        t.append_player(self.admin)
-        t.append_player(p)
+        t.join(self.admin)
+        t.join(p)
         l.teams.append(t)
         db.session.add(l)
         db.session.commit()
@@ -148,9 +156,9 @@ class RestTest(TestCase):
 
     @patch('lobbypy.models.player.get_player_summary_for_steam_id')
     def test_get_lobby_player(self, magic_get_summary):
-        l = Lobby('A', self.admin, '', '', '', '')
+        l = self._makeLobby('A', self.admin, '', '', '')
         t = Team('Red')
-        t.append_player(self.admin)
+        t.join(self.admin)
         l.teams.append(t)
         db.session.add(l)
         db.session.commit()
@@ -198,7 +206,7 @@ class RestTest(TestCase):
         self.assertEqual(l.name, 'Lobby')
 
     def test_update_lobby(self):
-        l = Lobby('Lobby', self.admin, 'test', 'test', 'test', 'test')
+        l = self._makeLobby('Lobby', self.admin, 'test', 'test', 'test')
         db.session.add(l)
         db.session.commit()
         resp = self.client.put('/admin/rest/lobbies/%d' % l.id, data=dict(name = 'Test'))
@@ -207,7 +215,7 @@ class RestTest(TestCase):
         self.assertEqual(l.name, 'Test')
 
     def test_delete_lobby(self):
-        l = Lobby('Lobby', self.admin, 'test', 'test', 'test', 'test')
+        l = self._makeLobby('Lobby', self.admin, 'test', 'test', 'test')
         db.session.add(l)
         db.session.commit()
         resp = self.client.delete('/admin/rest/lobbies/%d' % l.id)
@@ -216,7 +224,7 @@ class RestTest(TestCase):
         self.assertEqual(len(lobbies), 0)
 
     def test_append_team(self):
-        l = Lobby('Lobby', self.admin, 'test', 'test', 'test', 'test')
+        l = self._makeLobby('Lobby', self.admin, 'test', 'test', 'test')
         db.session.add(l)
         db.session.commit()
         resp = self.client.post('/admin/rest/lobbies/%d/teams' % l.id,
@@ -227,7 +235,7 @@ class RestTest(TestCase):
         self.assertEqual(l.teams[0].name, 'Red')
 
     def test_update_team(self):
-        l = Lobby('Lobby', self.admin, 'test', 'test', 'test', 'test')
+        l = self._makeLobby('Lobby', self.admin, 'test', 'test', 'test')
         t = Team('Red')
         l.teams.append(t)
         db.session.add(l)
@@ -239,7 +247,7 @@ class RestTest(TestCase):
         self.assertEqual(l.teams[0].name, 'Blu')
 
     def test_delete_team(self):
-        l = Lobby('Lobby', self.admin, 'test', 'test', 'test', 'test')
+        l = self._makeLobby('Lobby', self.admin, 'test', 'test', 'test')
         t = Team('Red')
         l.teams.append(t)
         db.session.add(l)
@@ -250,7 +258,7 @@ class RestTest(TestCase):
         self.assertEqual(len(l.teams), 0)
 
     def test_append_spectator(self):
-        l = Lobby('Lobby', self.admin, 'test', 'test', 'test', 'test')
+        l = self._makeLobby('Lobby', self.admin, 'test', 'test', 'test')
         p = Player('0')
         db.session.add(p)
         db.session.add(l)
@@ -262,7 +270,7 @@ class RestTest(TestCase):
         self.assertEqual(len(l.spectators), 1)
 
     def test_remove_spectator(self):
-        l = Lobby('Lobby', self.admin, 'test', 'test', 'test', 'test')
+        l = self._makeLobby('Lobby', self.admin, 'test', 'test', 'test')
         p = Player('0')
         l.spectators.append(p)
         db.session.add(p)
@@ -275,7 +283,7 @@ class RestTest(TestCase):
         self.assertEqual(len(l.spectators), 0)
 
     def test_append_lobby_player(self):
-        l = Lobby('Lobby', self.admin, 'test', 'test', 'test', 'test')
+        l = self._makeLobby('Lobby', self.admin, 'test', 'test', 'test')
         t = Team('Red')
         p = Player('0')
         l.teams.append(t)
@@ -289,10 +297,10 @@ class RestTest(TestCase):
         self.assertEqual(len(l.teams[0].players), 1)
 
     def test_update_lobby_player(self):
-        l = Lobby('Lobby', self.admin, 'test', 'test', 'test', 'test')
+        l = self._makeLobby('Lobby', self.admin, 'test', 'test', 'test')
         t = Team('Red')
         p = Player('0')
-        t.append_player(p)
+        t.join(p)
         l.teams.append(t)
         db.session.add(p)
         db.session.add(l)
@@ -305,10 +313,10 @@ class RestTest(TestCase):
         self.assertEqual(l.teams[0].players[0].class_id, 0)
 
     def test_delete_lobby_player(self):
-        l = Lobby('Lobby', self.admin, 'test', 'test', 'test', 'test')
+        l = self._makeLobby('Lobby', self.admin, 'test', 'test', 'test')
         t = Team('Red')
         p = Player('0')
-        t.append_player(p)
+        t.join(p)
         l.teams.append(t)
         db.session.add(p)
         db.session.add(l)
