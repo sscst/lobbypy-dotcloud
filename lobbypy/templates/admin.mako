@@ -63,12 +63,12 @@
         <tr>
           <td class="blup">
             <ul class="admin-lobbyplayers">
-              <li class="admin-blu-player">Player 1</li>
-              <li class="admin-blu-player">Player 2</li>
-              <li class="admin-blu-player">Player 3</li>
-              <li class="admin-blu-player">Player 4</li>
-              <li class="admin-blu-player">Player 5</li>
-              <li class="admin-blu-player">Player 6</li>
+              <li class="admin-blu-player"><input type="checkbox" name="blu-lobbyplayers" id="b1"><label class="lpt-label" for="b1">Player 1</label></li>
+              <li class="admin-blu-player"><input type="checkbox" name="blu-lobbyplayers" id="b2"><label class="lpt-label" for="b2">Player 2</label></li>
+              <li class="admin-blu-player"><input type="checkbox" name="blu-lobbyplayers" id="b3"><label class="lpt-label" for="b3">Player 3</label></li>
+              <li class="admin-blu-player"><input type="checkbox" name="blu-lobbyplayers" id="b4"><label class="lpt-label" for="b4">Player 4</label></li>
+              <li class="admin-blu-player"><input type="checkbox" name="blu-lobbyplayers" id="b5"><label class="lpt-label" for="b5">Player 5</label></li>
+              <li class="admin-blu-player"><input type="checkbox" name="blu-lobbyplayers" id="b6"><label class="lpt-label" for="b6">Player 6</label></li>
             </ul>
           </td>
           <td class="redp">
