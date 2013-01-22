@@ -1,7 +1,8 @@
-import os, json, urllib2
+import json, urllib2
+from flask import current_app
 from lobbypy.utils import cache
 def _get_api_key():
-    return os.environ['STEAM_API_KEY']
+    return current_app.config['STEAM_API_KEY']
 
 def _get_link_base():
     return 'http://api.steampowered.com/ISteamUser/'

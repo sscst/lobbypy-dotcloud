@@ -10,7 +10,8 @@ def create_app():
     return Flask(__name__)
 
 def config_app(app, **config):
-    app.secret_key = config['SESSION_KEY']
+    app.secret_key = str(config['SESSION_KEY'])
+    app.config['STEAM_API_KEY'] = config['STEAM_API_KEY']
     app.config['SQLALCHEMY_DATABASE_URI'] = config['DATABASE_URI']
     app.config['REDIS_URI'] = config['REDIS_URI']
     app.debug = config.get('DEBUG', False)

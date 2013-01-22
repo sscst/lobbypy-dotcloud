@@ -16,7 +16,8 @@ with open('environment.json') as f:
 config = {
         'DATABASE_URI':env['DATABASE_URI'],
         'REDIS_URI':env['REDIS_URI'],
-        'SESSION_KEY':env['SESSION_KEY']
+        'SESSION_KEY':env['SESSION_KEY'],
+        'STEAM_API_KEY':env['STEAM_API_KEY']
          }
 
 @manager.option('--no-rcon-check', dest='rcon_check', action='store_const',
