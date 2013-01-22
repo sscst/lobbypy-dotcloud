@@ -35,6 +35,8 @@ $(document).ready(function() {
     var lobby_socket = io.connect('/lobby');
     var chat_socket = io.connect('/chat');
 
+    var lobbyTemplate = Handlebars.compile($("#lobby-template").html());
+    var lobbyListingTemplate = Handlebars.compile($("#lobby-listing-template").html());
     var LobbyModel = Backbone.Model.extend({});
     var LobbyView = Backbone.View.extend({
         initialize: function() {
@@ -52,8 +54,7 @@ $(document).ready(function() {
         },
 
         render: function() {
-            var template = Handlebars.compile($("#lobby_template").html());
-            $(this.el).html(template(this.model));
+            $(this.el).html(lobbyTemplate(this.model));
             return this;
         }
     });
@@ -89,8 +90,7 @@ $(document).ready(function() {
         },
 
         render: function() {
-            var template = Handlebars.compile($("#lobby_listing_template").html());
-            $(this.el).html(template(this.collection));
+            $(this.el).html(lobbyListingTemplate(this.collection));
             return this;
         }
     });
