@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+  <meta http-equiv="Content-Type" content="text/html" charset="utf-8"/>
   ${utils.socketio_link()}
   ${utils.jquery_link()}
   ${utils.js_link("bootstrap.min.js")}
@@ -13,7 +13,7 @@
   ${next.js() | trim}
   ${utils.css_link("bootstrap.min.css")}
   ${utils.css_link("default.css")}
-  <%include file="handlebars.mako"/>
+  ${next.hb() | trim}
   <title>LobbyPy</title>
 </head>
 <body data-spy="scroll" data-target=".subnav" data-offset="50">
