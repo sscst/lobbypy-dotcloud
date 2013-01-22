@@ -10,35 +10,16 @@ def create_app():
     return Flask(__name__)
 
 def config_app(app, **config):
-    app.secret_key = (config.get('SESSION_KEY', None)
-            or os.environ['SESSION_KEY'])
-    app.config['SQLALCHEMY_DATABASE_URI'] = (
-            config.get('SQLALCHEMY_DATABASE_URI', None)
-            or os.environ.get('HEROKU_POSTGRESQL_BLUE_URL', None)
-            or os.environ['SQLALCHEMY_DATABASE_URI'])
-    app.config['REDIS_URL'] = urlparse.urlparse(os.environ.get('REDISTOGO_URL',
-        'redis://localhost'))
+    app.secret_key = config['SESSION_KEY']
+    app.config['SQLALCHEMY_DATABASE_URI'] = config['DATABASE_URI']
+    app.config['REDIS_URI'] = config['REDIS_URI']
     app.debug = config.get('DEBUG', False)
     app.config['TESTING'] = config.get('TESTING', False)
     app.config['RCON_CHECK_SERVER'] = config.get('RCON_CHECK_SERVER', True)
     app.config['CACHE_TYPE'] = config.get('CACHE_TYPE', 'null')
-    if app.config['CACHE_TYPE'] == 'redis':
-        app.config['CACHE_REDIS_HOST'] = config['CACHE_REDIS_HOST']
-        app.config['CACHE_REDIS_PORT'] = config.get('CACHE_REDIS_PORT', None)
-        app.config['CACHE_REDIS_PASSWORD'] = config.get('CACHE_REDIS_PASSWORD',
-                None)
-    ADMIN_URL = config.get('ADMIN_URL', 'admin')
+    admin_url = config.get('ADMIN_URL', 'admin')
     app.config['ADMIN_AUTH_TIMEOUT'] = config.get('ADMIN_AUTH_TIMEOUT',
             timedelta(hours=1))
-
-    if not app.debug and not app.config['TESTING']:
-        stderr_handler = logging.StreamHandler()
-        stderr_handler.setFormatter(logging.Formatter(
-            '%(asctime)s - [%(levelname)s]: %(message)s '
-            '[%(pathname)s:%(lineno)d]'))
-        for logger in [app.logger]:
-            logger.addHandler(stderr_handler)
-        app.logger.setLevel(logging.INFO)
 
     mako.init_app(app)
     db.init_app(app)
@@ -50,7 +31,7 @@ def config_app(app, **config):
     app.add_url_rule('/', view_func=views.index)
     app.add_url_rule('/login', view_func=views.login)
     app.add_url_rule('/logout', view_func=views.logout)
-    app.add_url_rule('/%s' % ADMIN_URL, view_func=views.admin, methods=['GET', 'POST'])
+    app.add_url_rule('/%s' % admin_url, view_func=views.admin, methods=['GET', 'POST'])
     app.add_url_rule('/socket.io/<path:path>', view_func=views.run_socketio)
 
     app.before_request(views.before_request)

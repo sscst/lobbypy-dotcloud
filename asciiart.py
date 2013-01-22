@@ -1,3 +1,5 @@
+import sys
+from random import randint
 images = ["""............................................................
 ......................................,+~....==.............
 .......................................,+=+..=..............
@@ -352,3 +354,12 @@ title = """ /$$                 /$$       /$$                 /$$$$$$$
                                          /$$  | $$           /$$  | $$
                                         |  $$$$$$/          |  $$$$$$/
                                          \______/            \______/ """
+
+def print_title():
+    sys.stderr.write(title + '\n')
+    sys.stderr.flush()
+
+def print_image():
+    for line in images[randint(0, len(images) - 1)].split('\n'):
+        sys.stderr.write(line + '\n')
+        sys.stderr.flush()

@@ -3,13 +3,6 @@ import redis
 from json import dumps, loads
 from flask import current_app, g
 
-def redis_kwargs():
-    url = current_app.config['REDIS_URL']
-    kwargs = dict(db=0, host=url.hostname, password=url.password)
-    if url.port:
-        kwargs['port'] = url.port
-    return kwargs
-
 class BaseNamespace(Namespace):
     def __init__(self, *args, **kwargs):
         app_request = kwargs.get('request', None)
@@ -28,7 +21,7 @@ class BaseNamespace(Namespace):
 
 class RedisBroadcastMixin(object):
     def broadcast_event(self, ns, event, *args):
-        r = redis.Redis(**redis_kwargs())
+        r = redis.Redis.from_url(current_app.config['REDIS_URI'])
         r.publish(ns, dumps(dict(event=event, args=args)))
         current_app.logger.debug(
                 'Publishing event %s with args %s on namespace %s' %
@@ -41,7 +34,7 @@ class RedisListenerMixin(object):
 
     def subscribe(self, ns):
         if not self.pubsub:
-            r = redis.StrictRedis(**redis_kwargs())
+            r = redis.StrictRedis.from_url(current_app.config['REDIS_URI'])
             self.pubsub = r.pubsub()
             self.pubsub.subscribe(ns)
             self.spawn(self.listener)

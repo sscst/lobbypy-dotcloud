@@ -1,0 +1,13 @@
+www:
+    type: custom
+    buildscript: builder
+    processes:
+        app: /home/dotcloud/env/bin/gunicorn -k socketio.sgunicorn.GeventSocketIOWorker -b 0.0.0.0:$PORT_WWW dotcloud:app
+    ports:
+        www: http
+    systempackages:
+        - libevent-dev
+db:
+    type: postgresql
+data:
+    type: redis
