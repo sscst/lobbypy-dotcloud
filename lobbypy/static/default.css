@@ -260,7 +260,9 @@ ul#specteamlist li {
 	color: #ffffff;
 }
 
-.admin-lobbyitem {
+.admin-lobbyitem,
+.admin-playeritem,
+.admin-noitems {
 	border: 1px #575757 solid;
 	color: #ffffff;
 	background-color: #737373;
