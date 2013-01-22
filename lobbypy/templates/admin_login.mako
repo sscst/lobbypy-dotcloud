@@ -4,6 +4,9 @@
 <%def name="js()" filter="trim">
 </%def>
 
+<%def name="hb()" filter="trim">
+</%def>
+
 <%def name="main_content()" filter="trim">
 <form class="form-horizontal" action='/admin' method="POST">
   <fieldset>

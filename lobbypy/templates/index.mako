@@ -6,8 +6,8 @@
 </%def>
 
 <%def name="hb()" filter="trim">
-  <%include file="handlebars/lobby_listing_template.mako"/>
-  <%include file="handlebars/lobby_template.mako"/>
+  <%include file="handlebars/lobby_listing.mako"/>
+  <%include file="handlebars/lobby.mako"/>
 </%def>
 
 <%def name="main_content()" filter="trim">

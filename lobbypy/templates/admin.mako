@@ -6,6 +6,11 @@
   ${utils.js_link("admin.js")}
 </%def>
 
+<%def name="hb()" filter="trim">
+  <%include file="handlebars/admin_lobby_listing.mako"/>
+  <%include file="handlebars/admin_player_listing.mako"/>
+</%def>
+
 <%def name="main_content()" filter="trim">
   <div id="legend">
     <legend>Admin Dashboard</legend>
@@ -13,21 +18,10 @@
   <div class="row">
     <div class="span6">
       <h3>Lobbies</h3>
-      <button class="btn btn-info pull-right" onclick="GetCurrentLobbies()"><i class="icon-refresh"></i></button>
+      <button id="get-lobbies" class="btn btn-info pull-right"><i class="icon-refresh"></i></button>
       <div class="span5">
         <div class="well" style="height: 200px; overflow: auto;">
           <div id="admin-lobby-list-container">
-	    <ul id="admin-lobby-list">
-	      <li class="admin-lobbyitem" id="id">
-		Hello world.
-	      </li>
-	      <li class="admin-lobbyitem" id="id">
-		This is a lobby
-	      </li>
-	      <li class="admin-lobbyitem" id="id">
-		Hello?
-	      </li>
-	    </ul>
 	  </div>
         </div>
         <button class="btn btn-success"><i class="icon-plus"></i> New lobby</button>
@@ -36,9 +30,11 @@
     </div>
     <div class="span6">
       <h3>Players</h3>
-      <button class="btn btn-info pull-right" onclick="GetCurrentPlayers()"><i class="icon-refresh"></i></button>
+      <button id="get-players" class="btn btn-info pull-right"><i class="icon-refresh"></i></button>
       <div class="span5">
         <div class="well" style="height: 200px; overflow: auto;">
+          <div id="admin-player-list-container">
+	  </div>
         </div>
         <button class="btn btn-success"><i class="icon-plus"></i> New player</button>
         <button class="btn btn-danger"><i class="icon-bolt"></i> Delete selected player</button><br />
