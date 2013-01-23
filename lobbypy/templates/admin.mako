@@ -78,44 +78,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="span3">
-      <h3>Lobby details</h3>
-      <strong>Lobby name</strong>
-      <p>Lobby ID: </p>
-      <p>Owner: </p>
-      <p>Game map: </p>
-      <p>Players: 9 / 18</p>
-    </div>
-    <div class="span3">
-      <h3>Teams</h3>
-      <table class="admin-lobbytable">
-        <tr>
-          <td class="bluh">BLU</td><td class="redh">RED</td>
-        </tr>
-        <tr>
-          <td class="blup">
-            <ul class="admin-lobbyplayers">
-              <li class="admin-blu-player"><input type="checkbox" name="blu-lobbyplayers" id="b1"><label class="lpt-label" for="b1">Player 1</label></li>
-              <li class="admin-blu-player"><input type="checkbox" name="blu-lobbyplayers" id="b2"><label class="lpt-label" for="b2">Player 2</label></li>
-              <li class="admin-blu-player"><input type="checkbox" name="blu-lobbyplayers" id="b3"><label class="lpt-label" for="b3">Player 3</label></li>
-              <li class="admin-blu-player"><input type="checkbox" name="blu-lobbyplayers" id="b4"><label class="lpt-label" for="b4">Player 4</label></li>
-              <li class="admin-blu-player"><input type="checkbox" name="blu-lobbyplayers" id="b5"><label class="lpt-label" for="b5">Player 5</label></li>
-              <li class="admin-blu-player"><input type="checkbox" name="blu-lobbyplayers" id="b6"><label class="lpt-label" for="b6">Player 6</label></li>
-            </ul>
-          </td>
-          <td class="redp">
-            <ul class="admin-lobbyplayers">
-              <li class="admin-red-player"><input type="checkbox" name="red-lobbyplayers" id="r1"><label class="lpt-label" for="r1">Player 1</label></li>
-              <li class="admin-red-player"><input type="checkbox" name="red-lobbyplayers" id="r2"><label class="lpt-label" for="r2">Player 2</label></li>
-              <li class="admin-red-player"><input type="checkbox" name="red-lobbyplayers" id="r3"><label class="lpt-label" for="r3">Player 3</label></li>
-              <li class="admin-red-player"><input type="checkbox" name="red-lobbyplayers" id="r4"><label class="lpt-label" for="r4">Player 4</label></li>
-              <li class="admin-red-player"><input type="checkbox" name="red-lobbyplayers" id="r5"><label class="lpt-label" for="r5">Player 5</label></li>
-              <li class="admin-red-player"><input type="checkbox" name="red-lobbyplayers" id="r6"><label class="lpt-label" for="r6">Player 6</label></li>
-            </ul>
-          </td>
-        </tr>
-      </table>
-      <p>Spectators: </p>
+    <div id="admin-lobby-details-container">
     </div>
     <div class="span6">
       <h3>Player details</h3>

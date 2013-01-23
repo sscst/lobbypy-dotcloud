@@ -94,6 +94,8 @@ def make_lobby_dict(l):
             'name': l.name,
             'owner': make_player_dict(l.owner),
             'game_map': l.game_map,
+            'player_count': l.player_count,
+            'spectator_count': l.spectator_count,
             'teams': [make_team_dict(i, t) for i,t in enumerate(l.teams)],
             'spectators': [make_player_dict(p) for p in l.spectators],
             }
@@ -187,4 +189,3 @@ def make_player_dict(p):
             'steam_id': p.steam_id,
             'name': p.name
             }
-

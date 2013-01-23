@@ -20,11 +20,13 @@ $(document).ready(function() {
             this.deselect();
             $(evt.currentTarget).addClass("selected");
             var id = getDbIdFromId($(evt.currentTarget).attr('id'));
-            lobbyDetails.model = this.collection.get(id)
+            lobbyDetails.model = this.collection.get(id);
             lobbyDetails.render();
         },
         deselect: function() {
             $(this.el).children(".admin-lobbyitem").removeClass("selected");
+            lobbyDetails.model = lobbyModel;
+            lobbyDetails.render();
         },
         update: function() {
             var me = this;
@@ -41,7 +43,8 @@ $(document).ready(function() {
     });
     var LobbyDetailsView = Backbone.View.extend({
         render: function() {
-            $(this.el).html(lobby_details_template(this.model.toJSON()));
+            var json = this.model.isNew() ? undefined : this.model.toJSON();
+            $(this.el).html(lobby_details_template(json));
             return this;
         }
     });
@@ -70,11 +73,13 @@ $(document).ready(function() {
             this.deselect();
             $(evt.currentTarget).addClass("selected");
             var id = getDbIdFromId($(evt.currentTarget).attr('id'));
-            playerDetails.model = this.collection.get(id)
+            playerDetails.model = this.collection.get(id);
             playerDetails.render();
         },
         deselect: function() {
             $(this.el).children(".admin-playeritem").removeClass("selected");
+            playerDetails.model = playerModel;
+            playerDetails.render();
         },
         update: function() {
             var me = this;
@@ -91,7 +96,8 @@ $(document).ready(function() {
     });
     var PlayerDetailsView = Backbone.View.extend({
         render: function() {
-            $(this.el).html(player_details_template(this.model.toJSON()));
+            var json = this.model.isNew() ? undefined : this.model.toJSON();
+            $(this.el).html(player_details_template(json));
             return this;
         }
     });
