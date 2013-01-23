@@ -33,4 +33,7 @@ class Player(db.Model):
 
     @property
     def name(self):
-        return self._get_player_summary()['personaname']
+        try:
+            return self._get_player_summary()['personaname']
+        except LookupError:
+            return 'Unknown'
