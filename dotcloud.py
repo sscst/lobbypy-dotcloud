@@ -10,7 +10,8 @@ config = {
         'DATABASE_URI':env['DOTCLOUD_DB_SQL_URL'].replace('pgsql', 'postgresql',
             1),
         'REDIS_URI':env['DOTCLOUD_DATA_REDIS_URL'],
-        'SESSION_KEY':env['SESSION_KEY']
+        'SESSION_KEY':env['SESSION_KEY'],
+        'STEAM_API_KEY':env['STEAM_API_KEY']
          }
 
 asciiart.print_image()
