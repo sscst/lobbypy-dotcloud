@@ -8,7 +8,9 @@
 
 <%def name="hb()" filter="trim">
   <%include file="handlebars/admin_lobby_listing.mako"/>
+  <%include file="handlebars/admin_lobby_details.mako"/>
   <%include file="handlebars/admin_player_listing.mako"/>
+  <%include file="handlebars/admin_player_details.mako"/>
 </%def>
 
 <%def name="main_content()" filter="trim">
@@ -117,9 +119,8 @@
     </div>
     <div class="span6">
       <h3>Player details</h3>
-      <strong>Player name</strong>
-      <p>Player ID: </p>
-      <p>Current lobby: </p>
+      <div id="admin-player-details-container">
+      </div>
     </div>
   </div>
   <div class="row">
