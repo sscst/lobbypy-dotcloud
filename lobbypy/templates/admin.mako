@@ -24,8 +24,27 @@
           <div id="admin-lobby-list-container">
 	  </div>
         </div>
-        <button class="btn btn-success"><i class="icon-plus"></i> New lobby</button>
-        <button class="btn btn-danger"><i class="icon-bolt"></i> Kill selected lobby</button>
+        <a href="#addLobby" data-toggle="modal"><button class="btn btn-success"><i class="icon-plus"></i> New lobby</button></a>
+        <div id="addLobby" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="addLobbyLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="addLobbyLabel">Create Lobby</h3>
+          </div>
+          <div class="modal-body">
+            <form id="create-lobby-form">
+              Name: <input type="text" name="name"/><br/>
+              Owner: <input type="text" name="owner_id"/><br/>
+              Server: <input type="text" name="server_address"/><br/>
+              Password: <input type="password" name="password"/><br/>
+              Map: <input type="text" name="game_map"/><br/>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button id="create-lobby" class="btn btn-primary" data-dismiss="modal">Create Lobby</button>
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+          </div>
+        </div>
+        <a id="delete-lobby" href="#deleteLobby" class="btn btn-danger"><i class="icon-bolt"></i> Delete selected lobby</a>
       </div>
     </div>
     <div class="span6">
@@ -36,8 +55,23 @@
           <div id="admin-player-list-container">
 	  </div>
         </div>
-        <button class="btn btn-success"><i class="icon-plus"></i> New player</button>
-        <button class="btn btn-danger"><i class="icon-bolt"></i> Delete selected player</button><br />
+        <a href="#addPlayer" data-toggle="modal"><button class="btn btn-success"><i class="icon-plus"></i> New player</button></a>
+        <div id="addPlayer" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="addPlayerLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="addPlayerLabel">Create Lobby</h3>
+          </div>
+          <div class="modal-body">
+            <form id="create-player-form">
+              64bit SteamID: <input type="text" name="steam_id"/><br/>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button id="create-player" class="btn btn-primary" data-dismiss="modal">Create Lobby</button>
+            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+          </div>
+        </div>
+        <button id="delete-player" class="btn btn-danger"><i class="icon-bolt"></i> Delete selected player</button><br />
       </div>
     </div>
   </div>

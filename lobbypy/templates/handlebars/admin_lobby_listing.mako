@@ -2,14 +2,8 @@
     {{#if lobbies}}
         <ul id="admin-lobby-list">
         {{#each lobbies}}
-            <li class="admin-lobbyitem" id="{{id}}">
-                {{! <img src="{{map_img}}" class="map-img" /> }}
-                {{! <img src="{{region}}" class="region-img" /> }}
-                {{! <img src="{{classes_left}}" class="classes-img" /> }}
-                {{! <span class="spectators">{{spectator_count}}</span> }}
+            <li class="admin-lobbyitem" id="lobby-{{id}}">
                 <span class="title">{{name}}</span>
-                <span class="map">{{game_map}}</span>
-                <span class="players">{{player_count}} / {{max_players}}</span>
             </li>
         {{/each}}
 	</ul>
