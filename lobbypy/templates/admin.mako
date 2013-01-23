@@ -24,7 +24,7 @@
           <div id="admin-lobby-list-container">
 	  </div>
         </div>
-        <a href="#addLobby" data-toggle="modal"><button class="btn btn-success"><i class="icon-plus"></i> New lobby</button></a>
+        <button class="btn btn-success" href="#addLobby" data-toggle="modal"><i class="icon-plus"></i> New lobby</button>
         <div id="addLobby" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="addLobbyLabel" aria-hidden="true">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -44,7 +44,7 @@
             <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
           </div>
         </div>
-        <a id="delete-lobby" href="#deleteLobby" class="btn btn-danger"><i class="icon-bolt"></i> Delete selected lobby</a>
+        <button id="delete-lobby" href="#deleteLobby" class="btn btn-danger"><i class="icon-bolt"></i> Delete selected lobby</a>
       </div>
     </div>
     <div class="span6">
@@ -71,7 +71,7 @@
             <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
           </div>
         </div>
-        <button id="delete-player" class="btn btn-danger"><i class="icon-bolt"></i> Delete selected player</button><br />
+        <button id="delete-player" class="btn btn-danger"><i class="icon-bolt"></i> Delete selected player</button><br/>
       </div>
     </div>
   </div>
