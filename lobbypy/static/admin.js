@@ -21,6 +21,7 @@ $(document).ready(function() {
         } else if (playerElements.length > 1) {
             deselectPlayers();
         }
+        updatePlayers();
     });
     $("#delete-lobby").click(function() {
         var lobbyElements = $(".admin-lobbyitem.selected");

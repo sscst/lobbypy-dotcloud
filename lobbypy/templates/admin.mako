@@ -55,7 +55,7 @@
           <div id="admin-player-list-container">
 	  </div>
         </div>
-        <a href="#addPlayer" data-toggle="modal"><button class="btn btn-success"><i class="icon-plus"></i> New player</button></a>
+        <button class="btn btn-success" href="#addPlayer" data-toggle="modal"><i class="icon-plus"></i> New player</button></a>
         <div id="addPlayer" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="addPlayerLabel" aria-hidden="true">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -67,7 +67,7 @@
             </form>
           </div>
           <div class="modal-footer">
-            <button id="create-player" class="btn btn-primary" data-dismiss="modal">Create Lobby</button>
+            <button id="create-player" class="btn btn-primary" data-dismiss="modal">Create Player</button>
             <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
           </div>
         </div>
